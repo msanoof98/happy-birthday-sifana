@@ -976,7 +976,7 @@ function ChapterTwoGrief({ onPhotoClick }: { onPhotoClick: (item: LightboxState)
             </p>
 
             <p className="font-serif text-fluid-body text-[#292524] leading-relaxed">
-              Losing Umma on July 14th, the very next day after our nikkah, shattered my heart in ways I still cannot explain. And I’m so deeply sorry that instead of being able to give you the joyful beginning and attention you deserved as a new bride, you’ve had to see me struggling, distant, and hurting like this.
+              Losing Umma, the very next day after our nikkah, shattered my heart in ways I still cannot explain. And I’m so deeply sorry that instead of being able to give you the joyful beginning and attention you deserved as a new bride, you’ve had to see me struggling, distant, and hurting like this.
             </p>
           </motion.div>
 

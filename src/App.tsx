@@ -1030,41 +1030,198 @@ function BirthdayCandleRitual() {
               Close your eyes, make a silent wish for our marriage and our future, then tap the flame to seal your prayer with Allah.
             </p>
 
-            {/* Candle with Flickering Flame */}
+            {/* Photorealistic Luxury Candle with Flickering Flame & Melted Wax */}
             <div className="pt-4 flex justify-center">
               <button
                 onClick={handleMakeWish}
-                className="group flex flex-col items-center cursor-pointer p-3 rounded-2xl hover:bg-[#FAF3EA]/50 transition-colors focus:outline-none"
+                className="group flex flex-col items-center cursor-pointer p-4 rounded-3xl hover:bg-[#FAF3EA]/60 transition-all focus:outline-none focus:ring-2 focus:ring-[#B89358]/40"
                 aria-label="Tap flame to seal your birthday wish"
               >
-                {/* Flame with ambient aura */}
-                <div className="relative mb-1">
+                {/* SVG Realistic Candle */}
+                <div className="relative w-36 h-48 flex items-center justify-center select-none">
+                  {/* Ambient Light Bloom from Flame */}
                   <motion.div
-                    className="w-7 h-10 relative"
+                    className="absolute top-2 w-28 h-28 rounded-full bg-gradient-to-t from-[#FFA000]/25 via-[#FFE082]/35 to-transparent blur-xl pointer-events-none"
                     animate={
                       shouldReduceMotion
                         ? {}
                         : {
-                            scaleY: [1, 1.14, 0.96, 1.1, 1],
-                            scaleX: [1, 0.94, 1.06, 0.96, 1],
-                            rotate: [-2, 2, -1, 3, 0],
+                            scale: [1, 1.15, 0.95, 1.1, 1],
+                            opacity: [0.65, 0.95, 0.7, 0.9, 0.65],
                           }
                     }
-                    transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+                    transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+                  />
+
+                  <svg
+                    viewBox="0 0 140 180"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-full h-full filter drop-shadow-md"
                   >
-                    {/* Glow Aura */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#B89358] to-[#FFD580] rounded-full blur-sm opacity-75 group-hover:opacity-100 transition-opacity" />
-                    {/* Inner flame */}
-                    <div className="absolute inset-x-1 bottom-0 top-1 bg-gradient-to-t from-[#881337] via-[#B89358] to-white rounded-full" />
-                  </motion.div>
+                    <defs>
+                      {/* Wax Cylinder 3D Shading Gradient */}
+                      <linearGradient id="waxCylinderGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#C4B4A0" />
+                        <stop offset="14%" stopColor="#EDE4D8" />
+                        <stop offset="38%" stopColor="#FFFDFB" />
+                        <stop offset="70%" stopColor="#E8DDCE" />
+                        <stop offset="90%" stopColor="#D9CBB9" />
+                        <stop offset="100%" stopColor="#B3A18C" />
+                      </linearGradient>
+
+                      {/* Melted Wax Rim Ellipse Gradient */}
+                      <radialGradient id="moltenWaxPool" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stopColor="#FFF3D6" />
+                        <stop offset="45%" stopColor="#F5E8D3" />
+                        <stop offset="85%" stopColor="#DECDB8" />
+                        <stop offset="100%" stopColor="#BAA790" />
+                      </radialGradient>
+
+                      {/* Brass Holder Gradient */}
+                      <linearGradient id="brassHolderGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#876831" />
+                        <stop offset="25%" stopColor="#D8BA7A" />
+                        <stop offset="45%" stopColor="#FCE4AA" />
+                        <stop offset="70%" stopColor="#BA974D" />
+                        <stop offset="100%" stopColor="#6E5121" />
+                      </linearGradient>
+
+                      {/* Flame Outer Gradient */}
+                      <linearGradient id="flameOuterGrad" x1="50%" y1="100%" x2="50%" y2="0%">
+                        <stop offset="0%" stopColor="#E64A19" />
+                        <stop offset="28%" stopColor="#FF9100" />
+                        <stop offset="70%" stopColor="#FFD54F" />
+                        <stop offset="95%" stopColor="#FFFDE7" />
+                        <stop offset="100%" stopColor="#FFFFFF" />
+                      </linearGradient>
+
+                      {/* Flame Inner Core Gradient */}
+                      <linearGradient id="flameCoreGrad" x1="50%" y1="100%" x2="50%" y2="0%">
+                        <stop offset="0%" stopColor="#FF6D00" />
+                        <stop offset="35%" stopColor="#FFD600" />
+                        <stop offset="75%" stopColor="#FFFDE7" />
+                        <stop offset="100%" stopColor="#FFFFFF" />
+                      </linearGradient>
+
+                      {/* Blue Base Flame Gradient */}
+                      <radialGradient id="flameBlueBase" cx="50%" cy="80%" r="60%">
+                        <stop offset="0%" stopColor="#2979FF" stopOpacity="0.85" />
+                        <stop offset="60%" stopColor="#00B0FF" stopOpacity="0.4" />
+                        <stop offset="100%" stopColor="#00E5FF" stopOpacity="0" />
+                      </radialGradient>
+                    </defs>
+
+                    {/* 1. Cast Shadow on Table/Card */}
+                    <ellipse cx="70" cy="166" rx="42" ry="7" fill="#1C1917" fillOpacity="0.12" />
+
+                    {/* 2. Antique Brass Saucer / Holder Base */}
+                    <ellipse cx="70" cy="160" rx="38" ry="6.5" fill="url(#brassHolderGrad)" />
+                    <ellipse cx="70" cy="159" rx="34" ry="5" fill="#5C4217" />
+                    <ellipse cx="70" cy="158" rx="33" ry="4.5" fill="url(#brassHolderGrad)" />
+
+                    {/* 3. Candle Pillar Body with 3D Cylindrical Shading */}
+                    <path
+                      d="M 45 92 
+                         C 45 88, 48 87, 70 87 
+                         C 92 87, 95 88, 95 92 
+                         L 95 155 
+                         C 95 159, 90 162, 70 162 
+                         C 50 162, 45 159, 45 155 
+                         Z"
+                      fill="url(#waxCylinderGrad)"
+                    />
+
+                    {/* 4. Organic Wax Drip running down left side */}
+                    <path
+                      d="M 45 94 
+                         C 43 98, 43 112, 46 114 
+                         C 47.5 115, 49 113, 48 108 
+                         C 47 103, 46 96, 45 94 Z"
+                      fill="#FFFDFB"
+                      fillOpacity="0.9"
+                    />
+
+                    {/* 5. Melted Wax Rim Pool (Top Concave Depression) */}
+                    <ellipse cx="70" cy="91" rx="25" ry="6" fill="url(#moltenWaxPool)" stroke="#BFAFA0" strokeWidth="0.6" />
+                    {/* Inner hot liquid wax sheen */}
+                    <ellipse cx="70" cy="91.5" rx="19" ry="4" fill="#FFE8B2" fillOpacity="0.65" />
+
+                    {/* 6. Braided Charcoal Wick */}
+                    {/* Lower wick in wax */}
+                    <path
+                      d="M 70 93 Q 69.5 83 71.5 76"
+                      stroke="#211E1B"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                    />
+                    {/* Glowing Ember Tip at Wick Peak */}
+                    <circle cx="71.5" cy="76" r="1.6" fill="#FF3D00" />
+                    <circle cx="71.5" cy="76" r="3.2" fill="#FF6D00" fillOpacity="0.5" />
+
+                    {/* 7. Realistic Flickering Flame Group */}
+                    <g transform="translate(0, 0)">
+                      <motion.g
+                        style={{ transformOrigin: "71.5px 76px" }}
+                        animate={
+                          shouldReduceMotion
+                            ? {}
+                            : {
+                                scaleY: [1, 1.12, 0.94, 1.08, 1],
+                                scaleX: [1, 0.93, 1.06, 0.95, 1],
+                                rotate: [-1.8, 2.2, -1.2, 1.6, 0],
+                                skewX: [-2, 1.8, -1, 1.5, 0],
+                              }
+                        }
+                        transition={{
+                          duration: 1.8,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                      >
+                        {/* Outer Licking Flame Teardrop */}
+                        <path
+                          d="M 71.5 35 
+                             C 64 50, 57 63, 62 73 
+                             C 65 78, 78 78, 81 73 
+                             C 86 63, 79 50, 71.5 35 Z"
+                          fill="url(#flameOuterGrad)"
+                        />
+
+                        {/* Inner High-Heat Core Teardrop */}
+                        <path
+                          d="M 71.5 44 
+                             C 66 54, 62 64, 65 72 
+                             C 67 76, 76 76, 78 72 
+                             C 81 64, 77 54, 71.5 44 Z"
+                          fill="url(#flameCoreGrad)"
+                        />
+
+                        {/* White-Hot Center Nucleus */}
+                        <path
+                          d="M 71.5 52 
+                             C 68 59, 66 66, 68 71 
+                             C 69 74, 74 74, 75 71 
+                             C 77 66, 75 59, 71.5 52 Z"
+                          fill="#FFFFFF"
+                          fillOpacity="0.95"
+                        />
+
+                        {/* Rich Blue Base Flame (Oxygen Zone) */}
+                        <ellipse cx="71.5" cy="74.5" rx="6.5" ry="3.5" fill="url(#flameBlueBase)" />
+                      </motion.g>
+                    </g>
+                  </svg>
                 </div>
 
-                {/* Candle Body */}
-                <div className="w-6 h-12 bg-gradient-to-b from-[#F6EDE2] to-[#E5D7C7] rounded-sm border border-[#D5C5B3]/60 shadow-inner" />
-
-                <span className="font-sans text-[10px] tracking-widest uppercase text-[#881337] font-semibold mt-3 group-hover:text-[#6a0e2a] transition-colors">
-                  Tap to Seal Wish
-                </span>
+                <div className="flex flex-col items-center mt-2 space-y-0.5">
+                  <span className="font-sans text-[11px] tracking-[0.25em] uppercase text-[#881337] font-semibold group-hover:text-[#6a0e2a] transition-colors">
+                    Tap to Seal Wish
+                  </span>
+                  <span className="font-serif italic text-xs text-[#786C5E]">
+                    Blow out the flame with love
+                  </span>
+                </div>
               </button>
             </div>
           </>

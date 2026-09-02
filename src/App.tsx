@@ -676,19 +676,17 @@ function EditorialHero({ onPhotoClick }: { onPhotoClick: (item: LightboxState) =
             Your first birthday since our Nikkah on July 13th. Written with total vulnerability, genuine remorse, and unwavering love from my heart to yours.
           </motion.p>
 
-          {/* Pill Highlights */}
+          {/* Milestone Badge Ribbon */}
           <motion.div
-            className="flex flex-wrap items-center gap-3 pt-2"
+            className="pt-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.7 }}
           >
-            <span className="font-sans text-[11px] tracking-[0.2em] uppercase bg-white border border-[#E8DCCF] text-[#1C1917] px-4 py-2 rounded-full shadow-sm font-medium">
-              Nikkah: July 13, 2026
-            </span>
-            <span className="font-sans text-[11px] tracking-[0.2em] uppercase bg-[#881337] text-white px-4 py-2 rounded-full shadow-sm font-medium">
-              Day 52 of Our Marriage
-            </span>
+            <div className="inline-flex items-center gap-2.5 font-sans text-[11px] tracking-[0.22em] uppercase bg-white/90 border border-[#E8DCCF] text-[#1C1917] px-4 sm:px-5 py-2.5 rounded-full shadow-sm font-medium">
+              <span className="w-2 h-2 rounded-full bg-[#881337] animate-pulse" />
+              <span>Nikkah: July 13, 2026 • Day 52 as Husband & Wife</span>
+            </div>
           </motion.div>
         </div>
 
@@ -767,40 +765,51 @@ function SacredUnionTimeline() {
   ];
 
   return (
-    <section className="py-12 px-6 sm:px-12 max-w-5xl mx-auto border-y border-[#EADFD4]/80">
-      <div className="text-center mb-6 space-y-1">
-        <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#881337] font-semibold block">
-          52 Days of Sacred Marriage
-        </span>
-        <p className="font-serif italic text-sm sm:text-base text-[#5C4F44]">
-          Counting every single second as husband and wife — since July 13, 2026 until eternity.
-        </p>
-      </div>
+    <section className="py-12 px-6 sm:px-12 max-w-4xl mx-auto">
+      {/* Heirloom Sacred Union Card */}
+      <motion.div
+        className="bg-white/80 backdrop-blur-md rounded-3xl border border-[#E8DCCF] p-8 sm:p-10 shadow-sm text-center relative overflow-hidden"
+        initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 1, ease: EASE_OUT_QUART }}
+      >
+        {/* Subtle interior gold border line */}
+        <div className="absolute inset-2 border border-[#B89358]/20 rounded-2xl pointer-events-none" />
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
-        {timeUnits.map((s, i) => (
-          <div
-            key={i}
-            className="p-5 bg-white/70 backdrop-blur-sm rounded-2xl border border-[#E8DCCF]/70 shadow-sm"
-          >
-            <span className="font-sans text-[10px] tracking-[0.25em] uppercase text-[#786C5E] font-semibold block mb-1">
-              {s.label}
+        <div className="relative z-10 space-y-6">
+          <div className="space-y-1.5">
+            <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#881337] font-semibold block">
+              Our Sacred Journey • July 13, 2026
             </span>
-            <motion.span
-              key={s.label === "Seconds" ? s.val : undefined}
-              initial={s.label === "Seconds" && !shouldReduceMotion ? { opacity: 0.6, y: -2 } : false}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25, ease: EASE_OUT_QUART }}
-              className="font-display text-3xl sm:text-4xl text-[#881337] font-normal block font-variant-numeric tabular-nums"
-            >
-              {s.val}
-            </motion.span>
-            <span className="font-serif italic text-xs text-[#786C5E] block mt-1">
-              {s.sub}
-            </span>
+            <p className="font-serif italic text-base sm:text-lg text-[#1C1917] max-w-xl mx-auto leading-snug">
+              “Fifty-two days since our hands met before Allah • and counting every second choosing you.”
+            </p>
           </div>
-        ))}
-      </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-0 pt-2 sm:divide-x sm:divide-[#B89358]/25">
+            {timeUnits.map((s, i) => (
+              <div key={i} className="px-4 py-2 text-center">
+                <span className="font-sans text-[10px] tracking-[0.25em] uppercase text-[#786C5E] font-semibold block mb-1">
+                  {s.label}
+                </span>
+                <motion.span
+                  key={s.label === "Seconds" ? s.val : undefined}
+                  initial={s.label === "Seconds" && !shouldReduceMotion ? { opacity: 0.5, y: -2 } : false}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, ease: EASE_OUT_QUART }}
+                  className="font-display text-3xl sm:text-4xl text-[#881337] font-normal block font-variant-numeric tabular-nums"
+                >
+                  {s.val}
+                </motion.span>
+                <span className="font-serif italic text-xs text-[#786C5E] block mt-0.5">
+                  {s.sub}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
     </section>
   );
 }
@@ -879,10 +888,13 @@ function ChapterOneApology({ onPhotoClick }: { onPhotoClick: (item: LightboxStat
             Your birthday feels especially important to me because this is your first birthday after our nikkah, and I want to make it as beautiful, peaceful, and special as you deserve.
           </p>
 
-          <div className="p-6 bg-[#FAF3EA] border-l-4 border-[#881337] rounded-r-2xl shadow-sm">
-            <p className="font-serif italic text-fluid-lead text-[#881337] font-medium leading-snug">
-              “But before anything else, I want to say I’m sorry.”
+          {/* Bespoke Editorial Apology Card */}
+          <div className="p-7 bg-gradient-to-br from-[#FAF3EA] to-[#F5ECE0] rounded-2xl border border-[#B89358]/35 shadow-sm text-center relative overflow-hidden">
+            <span className="font-serif text-3xl text-[#B89358]/60 block leading-none select-none mb-1">“</span>
+            <p className="font-serif italic text-fluid-lead text-[#881337] font-normal leading-relaxed -mt-2">
+              Before anything else, I want to say I’m sorry.
             </p>
+            <span className="font-serif text-3xl text-[#B89358]/60 block leading-none select-none mt-1">”</span>
           </div>
 
           <p className="font-serif text-fluid-body text-[#3E3834] leading-relaxed">
@@ -1473,12 +1485,7 @@ const promises: PromiseItem[] = [
 ];
 
 function ForAllOurTomorrows() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
   const shouldReduceMotion = useReducedMotion();
-
-  const toggle = (idx: number) => {
-    setOpenIndex(openIndex === idx ? null : idx);
-  };
 
   return (
     <section className="py-24 px-6 sm:px-12 max-w-3xl mx-auto">
@@ -1492,79 +1499,38 @@ function ForAllOurTomorrows() {
           Three Promises for Our Marriage
         </h2>
         <p className="font-serif italic text-fluid-body text-[#5C4F44]">
-          Tap each seal to unfold a lifelong promise from my heart to yours.
+          Lifelong vows written from my heart to yours.
         </p>
       </div>
 
-      <div className="space-y-4">
-        {promises.map((p, idx) => {
-          const isOpen = openIndex === idx;
+      <div className="space-y-6">
+        {promises.map((p, idx) => (
+          <motion.div
+            key={idx}
+            className="bg-white/85 backdrop-blur-sm rounded-3xl border border-[#EADFD4] p-7 sm:p-9 shadow-sm hover:border-[#B89358]/60 hover:shadow-md transition-all duration-500 relative overflow-hidden group"
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.8, delay: idx * 0.12, ease: EASE_OUT_QUART }}
+          >
+            {/* Subtle corner gold leaf accent */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#B89358]/10 via-transparent to-transparent pointer-events-none" />
 
-          return (
-            <motion.div
-              key={idx}
-              role="button"
-              tabIndex={0}
-              aria-expanded={isOpen}
-              className={`rounded-2xl border transition-all duration-300 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#B89358]/50 ${
-                isOpen
-                  ? "bg-white border-[#B89358] shadow-[0_12px_28px_-6px_rgba(184,147,88,0.18)]"
-                  : "bg-[#FAF8F5] border-[#EADFD4] hover:border-[#B89358]/50"
-              }`}
-              onClick={() => toggle(idx)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  toggle(idx);
-                }
-              }}
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-            >
-              <div className="p-6 sm:p-7 flex items-center justify-between gap-4 select-none">
-                <div className="flex items-center gap-4">
-                  <span
-                    className={`w-9 h-9 rounded-full flex items-center justify-center font-serif text-sm font-semibold transition-colors duration-300 ${
-                      isOpen
-                        ? "bg-[#881337] text-white shadow-sm"
-                        : "border border-[#B89358]/60 text-[#881337]"
-                    }`}
-                  >
-                    {p.number}
-                  </span>
-                  <h3 className="font-display text-fluid-lead font-medium text-[#1C1917]">
-                    {p.title}
-                  </h3>
-                </div>
-                <motion.span
-                  className="text-xs text-[#B89358] font-serif"
-                  animate={{ rotate: isOpen ? 180 : 0 }}
-                  transition={{ duration: 0.35, ease: EASE_OUT_QUART }}
-                >
-                  ▼
-                </motion.span>
+            <div className="flex items-start gap-4 sm:gap-5 relative z-10">
+              <span className="w-10 h-10 rounded-full bg-[#FAF3EA] border border-[#B89358]/50 flex items-center justify-center font-serif text-sm font-semibold text-[#881337] flex-shrink-0 shadow-sm group-hover:bg-[#881337] group-hover:text-white transition-colors duration-300">
+                {p.number}
+              </span>
+              <div className="space-y-2.5 flex-1">
+                <h3 className="font-display text-fluid-lead font-medium text-[#1C1917] tracking-tight">
+                  {p.title}
+                </h3>
+                <p className="font-serif text-fluid-body text-[#3E3834] leading-relaxed">
+                  {p.text}
+                </p>
               </div>
-
-              <AnimatePresence initial={false}>
-                {isOpen && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{
-                      duration: shouldReduceMotion ? 0.05 : 0.45,
-                      ease: EASE_OUT_QUART,
-                    }}
-                  >
-                    <div className="px-6 sm:px-7 pb-7 pt-1 border-t border-[#B89358]/15 text-[#3E3834] font-serif text-fluid-body leading-relaxed">
-                      {p.text}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          );
-        })}
+            </div>
+          </motion.div>
+        ))}
       </div>
 
       {/* Birthday Wish Candle Ritual */}
@@ -1697,7 +1663,7 @@ function ScrollCompanion() {
             exit={{ opacity: 0, scale: 0.8 }}
             aria-label="Scroll back to top"
           >
-            <span className="font-serif text-sm font-semibold">▲</span>
+            <BotanicalRose className="w-5 h-5 text-[#881337]" />
           </motion.button>
         )}
       </AnimatePresence>

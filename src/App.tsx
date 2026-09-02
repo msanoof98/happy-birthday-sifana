@@ -262,80 +262,104 @@ function InteractiveButterfly({
 
   const handleFlutter = () => {
     setIsFluttering(true);
-    setTimeout(() => setIsFluttering(false), 1400);
+    setTimeout(() => setIsFluttering(false), 1600);
   };
 
   return (
-    <div className="relative inline-block group">
-      <motion.svg
-        viewBox="0 0 60 60"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className={`${className} cursor-pointer`}
-        aria-label="Gold butterfly - tap to flutter"
+    <div className="relative inline-block group select-none">
+      <motion.div
+        animate={
+          isFluttering
+            ? {
+                scale: [1, 1.28, 0.92, 1.15, 1],
+                y: [0, -14, -4, -10, 0],
+                rotate: [0, -14, 14, -6, 0],
+              }
+            : shouldReduceMotion
+            ? {}
+            : {
+                y: [-3, 3, -3],
+                rotate: [-2, 2, -2],
+              }
+        }
+        transition={{
+          duration: isFluttering ? 1.2 : 4.5,
+          repeat: isFluttering ? 0 : Infinity,
+          ease: "easeInOut",
+        }}
+        className="cursor-pointer p-1.5 focus:outline-none"
         role="button"
         tabIndex={0}
         onClick={handleFlutter}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") handleFlutter();
         }}
-        animate={
-          isFluttering
-            ? {
-                scale: [1, 1.25, 0.95, 1.15, 1],
-                rotate: [0, -12, 12, -6, 0],
-              }
-            : shouldReduceMotion
-              ? {}
-              : {
-                  scale: [1, 1.05, 1],
-                  opacity: [0.85, 1, 0.85],
-                }
-        }
-        transition={{ duration: isFluttering ? 0.9 : 4, repeat: isFluttering ? 0 : Infinity, ease: "easeInOut" }}
+        aria-label="Gold butterfly - tap to flutter and whisper"
       >
-        <path
-          d="M30 30 C22 12, 4 10, 7 26 C9 35, 20 36, 30 30Z"
-          fill="#881337"
-          fillOpacity="0.08"
-          stroke="#B89358"
-          strokeWidth="0.9"
-        />
-        <path
-          d="M30 30 C38 12, 56 10, 53 26 C51 35, 40 36, 30 30Z"
-          fill="#881337"
-          fillOpacity="0.08"
-          stroke="#B89358"
-          strokeWidth="0.9"
-        />
-        <path
-          d="M30 30 C22 36, 6 44, 12 34 C15 30, 24 30, 30 30Z"
-          fill="#1C1917"
-          fillOpacity="0.05"
-          stroke="#B89358"
-          strokeWidth="0.75"
-        />
-        <path
-          d="M30 30 C38 36, 54 44, 48 34 C45 30, 36 30, 30 30Z"
-          fill="#1C1917"
-          fillOpacity="0.05"
-          stroke="#B89358"
-          strokeWidth="0.75"
-        />
-        <line x1="30" y1="22" x2="30" y2="38" stroke="#881337" strokeWidth="1.2" strokeLinecap="round" />
-      </motion.svg>
+        <svg
+          viewBox="0 0 60 60"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className={`${className} filter drop-shadow-sm`}
+        >
+          {/* Upper Left Wing */}
+          <motion.path
+            d="M30 30 C22 12, 4 10, 7 26 C9 35, 20 36, 30 30Z"
+            fill="#881337"
+            fillOpacity="0.1"
+            stroke="#B89358"
+            strokeWidth="0.9"
+            animate={isFluttering ? { rotateY: [0, 55, -20, 45, 0] } : {}}
+            transition={{ duration: 0.5, repeat: isFluttering ? 2 : 0 }}
+            style={{ transformOrigin: "30px 30px" }}
+          />
+          {/* Upper Right Wing */}
+          <motion.path
+            d="M30 30 C38 12, 56 10, 53 26 C51 35, 40 36, 30 30Z"
+            fill="#881337"
+            fillOpacity="0.1"
+            stroke="#B89358"
+            strokeWidth="0.9"
+            animate={isFluttering ? { rotateY: [0, -55, 20, -45, 0] } : {}}
+            transition={{ duration: 0.5, repeat: isFluttering ? 2 : 0 }}
+            style={{ transformOrigin: "30px 30px" }}
+          />
+          {/* Lower Left Wing */}
+          <path
+            d="M30 30 C22 36, 6 44, 12 34 C15 30, 24 30, 30 30Z"
+            fill="#1C1917"
+            fillOpacity="0.06"
+            stroke="#B89358"
+            strokeWidth="0.75"
+          />
+          {/* Lower Right Wing */}
+          <path
+            d="M30 30 C38 36, 54 44, 48 34 C45 30, 36 30, 30 30Z"
+            fill="#1C1917"
+            fillOpacity="0.06"
+            stroke="#B89358"
+            strokeWidth="0.75"
+          />
+          {/* Slender Body */}
+          <line x1="30" y1="20" x2="30" y2="40" stroke="#881337" strokeWidth="1.3" strokeLinecap="round" />
+          {/* Antennae */}
+          <path d="M 30 20 Q 26 15 24 16" stroke="#B89358" strokeWidth="0.75" strokeLinecap="round" />
+          <path d="M 30 20 Q 34 15 36 16" stroke="#B89358" strokeWidth="0.75" strokeLinecap="round" />
+        </svg>
+      </motion.div>
 
       {/* Whispering Tooltip */}
       {showWhisper && (
         <AnimatePresence>
           {isFluttering && (
             <motion.div
-              initial={{ opacity: 0, y: 8, scale: 0.9 }}
-              animate={{ opacity: 1, y: -2, scale: 1 }}
-              exit={{ opacity: 0, y: -6, scale: 0.9 }}
-              className="absolute left-1/2 -translate-x-1/2 -top-10 whitespace-nowrap bg-[#881337] text-white text-[11px] font-sans px-3 py-1 rounded-full shadow-lg pointer-events-none z-30"
+              initial={{ opacity: 0, y: 10, scale: 0.9 }}
+              animate={{ opacity: 1, y: -4, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.9 }}
+              transition={{ duration: 0.35, ease: EASE_OUT_QUART }}
+              className="absolute left-1/2 -translate-x-1/2 -top-12 whitespace-nowrap bg-[#FAF8F5]/95 backdrop-blur-md border border-[#B89358]/50 text-[#881337] text-xs font-serif italic px-3.5 py-1.5 rounded-full shadow-lg pointer-events-none z-30"
             >
-              My steadfast love, today and always ❦
+              “You are my peace, today and always ❦”
             </motion.div>
           )}
         </AnimatePresence>
@@ -586,7 +610,7 @@ function EditorialNav({
         <div className="flex items-center gap-3">
           <button
             onClick={onToggleAudio}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border transition-all text-xs font-sans tracking-wider cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-full border transition-all duration-300 text-xs font-sans tracking-wider cursor-pointer shadow-sm hover:scale-[1.02] active:scale-[0.98] ${
               isPlayingAudio
                 ? "bg-[#881337] text-white border-[#881337] shadow-sm"
                 : "bg-white/80 hover:bg-[#FAF3EA] text-[#881337] border-[#B89358]/50"
@@ -1200,11 +1224,17 @@ function ChapterFourBlessing({ onPhotoClick }: { onPhotoClick: (item: LightboxSt
    ═══════════════════════════════════════════════════════════════ */
 
 function BirthdayCandleRitual() {
+  const [isBlowingOut, setIsBlowingOut] = useState(false);
   const [wishSealed, setWishSealed] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
   const handleMakeWish = () => {
-    setWishSealed(true);
+    if (isBlowingOut || wishSealed) return;
+    setIsBlowingOut(true);
+    setTimeout(() => {
+      setWishSealed(true);
+      setIsBlowingOut(false);
+    }, 1100);
   };
 
   return (
@@ -1230,7 +1260,8 @@ function BirthdayCandleRitual() {
             <div className="pt-4 flex justify-center">
               <button
                 onClick={handleMakeWish}
-                className="group flex flex-col items-center cursor-pointer p-4 rounded-3xl hover:bg-[#FAF3EA]/60 transition-all focus:outline-none focus:ring-2 focus:ring-[#B89358]/40"
+                disabled={isBlowingOut}
+                className="group flex flex-col items-center cursor-pointer p-4 rounded-3xl hover:bg-[#FAF3EA]/60 transition-all focus:outline-none focus:ring-2 focus:ring-[#B89358]/40 select-none"
                 aria-label="Tap flame to seal your birthday wish"
               >
                 {/* SVG Realistic Candle */}
@@ -1239,15 +1270,27 @@ function BirthdayCandleRitual() {
                   <motion.div
                     className="absolute top-2 w-28 h-28 rounded-full bg-gradient-to-t from-[#FFA000]/25 via-[#FFE082]/35 to-transparent blur-xl pointer-events-none"
                     animate={
-                      shouldReduceMotion
-                        ? {}
+                      shouldReduceMotion || isBlowingOut
+                        ? { opacity: isBlowingOut ? 0 : 0.4 }
                         : {
                             scale: [1, 1.15, 0.95, 1.1, 1],
                             opacity: [0.65, 0.95, 0.7, 0.9, 0.65],
                           }
                     }
-                    transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+                    transition={{ duration: isBlowingOut ? 0.3 : 1.6, repeat: isBlowingOut ? 0 : Infinity, ease: "easeInOut" }}
                   />
+
+                  {/* Golden Sparkles on Wish Blowout */}
+                  {isBlowingOut && !shouldReduceMotion && (
+                    <motion.div
+                      className="absolute top-8 pointer-events-none flex items-center justify-center text-[#B89358] text-xl"
+                      initial={{ opacity: 0, scale: 0.5, y: 0 }}
+                      animate={{ opacity: [0, 1, 0], scale: [0.5, 1.6], y: -25 }}
+                      transition={{ duration: 0.9, ease: EASE_OUT_QUART }}
+                    >
+                      ✨
+                    </motion.div>
+                  )}
 
                   <svg
                     viewBox="0 0 140 180"
@@ -1353,69 +1396,97 @@ function BirthdayCandleRitual() {
                     />
                     {/* Glowing Ember Tip at Wick Peak */}
                     <circle cx="71.5" cy="76" r="1.6" fill="#FF3D00" />
-                    <circle cx="71.5" cy="76" r="3.2" fill="#FF6D00" fillOpacity="0.5" />
+                    <motion.circle
+                      cx="71.5"
+                      cy="76"
+                      r="3.2"
+                      fill="#FF6D00"
+                      animate={isBlowingOut ? { scale: [1, 1.8, 1.2], opacity: [0.5, 1, 0.3] } : {}}
+                      transition={{ duration: 0.9 }}
+                      fillOpacity="0.5"
+                    />
+
+                    {/* Smoke Wisp Rising when flame is blown out */}
+                    {isBlowingOut && !shouldReduceMotion && (
+                      <motion.g
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: [0, 0.85, 0.45, 0], y: [0, -32], x: [0, 5, -4, 6] }}
+                        transition={{ duration: 1.1, ease: "easeOut" }}
+                      >
+                        <path
+                          d="M 71.5 74 C 67 63, 76 54, 69 44 C 64 34, 73 24, 68 14"
+                          stroke="#C4B4A0"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          fill="none"
+                          strokeDasharray="2 3"
+                        />
+                      </motion.g>
+                    )}
 
                     {/* 7. Realistic Flickering Flame Group */}
-                    <g transform="translate(0, 0)">
-                      <motion.g
-                        style={{ transformOrigin: "71.5px 76px" }}
-                        animate={
-                          shouldReduceMotion
-                            ? {}
-                            : {
-                                scaleY: [1, 1.12, 0.94, 1.08, 1],
-                                scaleX: [1, 0.93, 1.06, 0.95, 1],
-                                rotate: [-1.8, 2.2, -1.2, 1.6, 0],
-                                skewX: [-2, 1.8, -1, 1.5, 0],
-                              }
-                        }
-                        transition={{
-                          duration: 1.8,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                        }}
-                      >
-                        {/* Outer Licking Flame Teardrop */}
-                        <path
-                          d="M 71.5 35 
-                             C 64 50, 57 63, 62 73 
-                             C 65 78, 78 78, 81 73 
-                             C 86 63, 79 50, 71.5 35 Z"
-                          fill="url(#flameOuterGrad)"
-                        />
+                    {!isBlowingOut && (
+                      <g transform="translate(0, 0)">
+                        <motion.g
+                          style={{ transformOrigin: "71.5px 76px" }}
+                          animate={
+                            shouldReduceMotion
+                              ? {}
+                              : {
+                                  scaleY: [1, 1.12, 0.94, 1.08, 1],
+                                  scaleX: [1, 0.93, 1.06, 0.95, 1],
+                                  rotate: [-1.8, 2.2, -1.2, 1.6, 0],
+                                  skewX: [-2, 1.8, -1, 1.5, 0],
+                                }
+                          }
+                          transition={{
+                            duration: 1.8,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          }}
+                        >
+                          {/* Outer Licking Flame Teardrop */}
+                          <path
+                            d="M 71.5 35 
+                               C 64 50, 57 63, 62 73 
+                               C 65 78, 78 78, 81 73 
+                               C 86 63, 79 50, 71.5 35 Z"
+                            fill="url(#flameOuterGrad)"
+                          />
 
-                        {/* Inner High-Heat Core Teardrop */}
-                        <path
-                          d="M 71.5 44 
-                             C 66 54, 62 64, 65 72 
-                             C 67 76, 76 76, 78 72 
-                             C 81 64, 77 54, 71.5 44 Z"
-                          fill="url(#flameCoreGrad)"
-                        />
+                          {/* Inner High-Heat Core Teardrop */}
+                          <path
+                            d="M 71.5 44 
+                               C 66 54, 62 64, 65 72 
+                               C 67 76, 76 76, 78 72 
+                               C 81 64, 77 54, 71.5 44 Z"
+                            fill="url(#flameCoreGrad)"
+                          />
 
-                        {/* White-Hot Center Nucleus */}
-                        <path
-                          d="M 71.5 52 
-                             C 68 59, 66 66, 68 71 
-                             C 69 74, 74 74, 75 71 
-                             C 77 66, 75 59, 71.5 52 Z"
-                          fill="#FFFFFF"
-                          fillOpacity="0.95"
-                        />
+                          {/* White-Hot Center Nucleus */}
+                          <path
+                            d="M 71.5 52 
+                               C 68 59, 66 66, 68 71 
+                               C 69 74, 74 74, 75 71 
+                               C 77 66, 75 59, 71.5 52 Z"
+                            fill="#FFFFFF"
+                            fillOpacity="0.95"
+                          />
 
-                        {/* Rich Blue Base Flame (Oxygen Zone) */}
-                        <ellipse cx="71.5" cy="74.5" rx="6.5" ry="3.5" fill="url(#flameBlueBase)" />
-                      </motion.g>
-                    </g>
+                          {/* Rich Blue Base Flame (Oxygen Zone) */}
+                          <ellipse cx="71.5" cy="74.5" rx="6.5" ry="3.5" fill="url(#flameBlueBase)" />
+                        </motion.g>
+                      </g>
+                    )}
                   </svg>
                 </div>
 
                 <div className="flex flex-col items-center mt-2 space-y-0.5">
                   <span className="font-sans text-[11px] tracking-[0.25em] uppercase text-[#881337] font-semibold group-hover:text-[#6a0e2a] transition-colors">
-                    Tap to Seal Wish
+                    {isBlowingOut ? "Sealing wish with Allah..." : "Tap to Seal Wish"}
                   </span>
                   <span className="font-serif italic text-xs text-[#786C5E]">
-                    Blow out the flame with love
+                    {isBlowingOut ? "Releasing prayers to the heavens ❦" : "Blow out the flame with love"}
                   </span>
                 </div>
               </button>

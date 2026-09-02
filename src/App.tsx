@@ -59,8 +59,8 @@ function StarterScreen({ onOpen }: { onOpen: () => void }) {
 
         {/* Monogram Header */}
         <div className="space-y-3">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full border border-[#B89358]/50 bg-white/80 shadow-sm mx-auto">
-            <GoldKnotIcon className="w-8 h-8 text-[#B89358]" />
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full border border-[#B89358]/50 bg-white/80 shadow-sm mx-auto p-2">
+            <BotanicalRose className="w-full h-full" />
           </div>
           <p className="font-sans text-[11px] tracking-[0.3em] uppercase text-[#786C5E] font-semibold">
             A Bespoke Keepsake • For My Wife
@@ -344,24 +344,57 @@ function InteractiveButterfly({
   );
 }
 
+function BotanicalRose({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 60 60" fill="none" className={className} aria-hidden="true">
+      <defs>
+        <radialGradient id="roseAccentGrad" cx="42%" cy="40%" r="58%">
+          <stop offset="0%" stopColor="#A81D45" />
+          <stop offset="45%" stopColor="#881337" />
+          <stop offset="85%" stopColor="#55081E" />
+          <stop offset="100%" stopColor="#360211" />
+        </radialGradient>
+        <linearGradient id="roseAccentStem" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#C49B5B" />
+          <stop offset="100%" stopColor="#7E6032" />
+        </linearGradient>
+      </defs>
+      {/* Curved Stem */}
+      <path d="M 30 32 Q 28 44 32 55" stroke="url(#roseAccentStem)" strokeWidth="1.6" strokeLinecap="round" />
+      {/* Delicate Antique Gold Leaves */}
+      <path d="M 29 40 Q 18 36 17 44 Q 25 46 29 42" fill="#B89358" fillOpacity="0.55" stroke="#876831" strokeWidth="0.8" />
+      <path d="M 31 45 Q 42 41 43 49 Q 36 51 31 47" fill="#B89358" fillOpacity="0.55" stroke="#876831" strokeWidth="0.8" />
+      {/* Rose Calyx */}
+      <path d="M 22 29 Q 30 34 38 29 Q 30 31 22 29 Z" fill="#55081E" />
+      {/* Rose Bloom Petals */}
+      <ellipse cx="30" cy="21" rx="14" ry="12" fill="url(#roseAccentGrad)" />
+      {/* Petal Highlights & Creases */}
+      <path d="M 19 18 C 18 11, 38 10, 39 18 C 40 25, 32 29, 23 28" stroke="#ECA0B2" strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M 23 23 C 24 28, 36 28, 36 20 C 36 14, 26 14, 25 19" stroke="#F6C5D0" strokeWidth="1.3" strokeLinecap="round" />
+      <path d="M 27 19 C 28 16, 33 16, 33 20 C 33 22, 29 23, 28 21" stroke="#FFF0F3" strokeWidth="1.1" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function SectionDivider({ label }: { label?: string }) {
   return (
-    <div className="py-14 flex items-center justify-center gap-4 max-w-xl mx-auto px-6">
+    <div className="py-14 flex items-center justify-center gap-4 max-w-xl mx-auto px-6 select-none">
       <span className="h-px flex-1 bg-gradient-to-r from-transparent to-[#B89358]/40" />
-      {label ? (
-        <span className="font-sans text-[11px] tracking-[0.3em] uppercase text-[#B89358] font-semibold">
-          {label}
-        </span>
-      ) : (
-        <span className="text-[#B89358] text-xs">❦</span>
-      )}
+      <div className="flex items-center gap-2.5">
+        <BotanicalRose className="w-6 h-6 text-[#881337]" />
+        {label && (
+          <span className="font-sans text-[11px] tracking-[0.3em] uppercase text-[#B89358] font-semibold">
+            {label}
+          </span>
+        )}
+      </div>
       <span className="h-px flex-1 bg-gradient-to-l from-transparent to-[#B89358]/40" />
     </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   SUBTLE BOTANICAL & FLORAL BACKGROUND ANIMATION
+   SUBTLE FALLING ROSES & PETALS ANIMATION (PURE CLEAN BACKGROUND)
    ═══════════════════════════════════════════════════════════════ */
 
 interface PetalConfig {
@@ -370,23 +403,25 @@ interface PetalConfig {
   size: number;
   duration: number;
   delay: number;
-  type: "rose" | "goldLeaf" | "blossom";
+  type: "rose" | "fullRose" | "goldLeaf";
   drift: number;
 }
 
 const PETALS_CONFIG: PetalConfig[] = [
-  { id: 1, left: "5%", size: 20, duration: 22, delay: 0, type: "rose", drift: 24 },
-  { id: 2, left: "14%", size: 16, duration: 28, delay: 6, type: "goldLeaf", drift: -20 },
-  { id: 3, left: "25%", size: 24, duration: 20, delay: 11, type: "blossom", drift: 18 },
-  { id: 4, left: "36%", size: 18, duration: 25, delay: 3, type: "rose", drift: -22 },
-  { id: 5, left: "47%", size: 22, duration: 23, delay: 14, type: "goldLeaf", drift: 26 },
-  { id: 6, left: "58%", size: 15, duration: 27, delay: 8, type: "blossom", drift: -16 },
-  { id: 7, left: "69%", size: 22, duration: 21, delay: 1, type: "rose", drift: 22 },
-  { id: 8, left: "80%", size: 17, duration: 26, delay: 16, type: "goldLeaf", drift: -24 },
-  { id: 9, left: "91%", size: 25, duration: 19, delay: 5, type: "rose", drift: 15 },
-  { id: 10, left: "10%", size: 21, duration: 24, delay: 18, type: "blossom", drift: 20 },
-  { id: 11, left: "53%", size: 16, duration: 30, delay: 10, type: "rose", drift: -18 },
-  { id: 12, left: "86%", size: 19, duration: 22, delay: 13, type: "blossom", drift: 25 },
+  { id: 1, left: "4%", size: 24, duration: 20, delay: 0, type: "rose", drift: 22 },
+  { id: 2, left: "12%", size: 28, duration: 26, delay: 5, type: "fullRose", drift: -18 },
+  { id: 3, left: "22%", size: 18, duration: 22, delay: 11, type: "goldLeaf", drift: 20 },
+  { id: 4, left: "32%", size: 26, duration: 24, delay: 2, type: "fullRose", drift: -24 },
+  { id: 5, left: "42%", size: 22, duration: 19, delay: 8, type: "rose", drift: 18 },
+  { id: 6, left: "52%", size: 30, duration: 27, delay: 14, type: "fullRose", drift: -16 },
+  { id: 7, left: "62%", size: 24, duration: 21, delay: 3, type: "rose", drift: 25 },
+  { id: 8, left: "72%", size: 27, duration: 25, delay: 16, type: "fullRose", drift: -22 },
+  { id: 9, left: "82%", size: 22, duration: 23, delay: 7, type: "rose", drift: 19 },
+  { id: 10, left: "92%", size: 29, duration: 22, delay: 12, type: "fullRose", drift: -15 },
+  { id: 11, left: "18%", size: 25, duration: 28, delay: 9, type: "rose", drift: 20 },
+  { id: 12, left: "87%", size: 20, duration: 21, delay: 1, type: "goldLeaf", drift: -20 },
+  { id: 13, left: "47%", size: 25, duration: 24, delay: 18, type: "rose", drift: 24 },
+  { id: 14, left: "68%", size: 19, duration: 29, delay: 13, type: "goldLeaf", drift: -18 },
 ];
 
 function BotanicalBackground() {
@@ -397,15 +432,23 @@ function BotanicalBackground() {
       className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none"
       aria-hidden="true"
     >
-      {/* SVG Defs for Petal Gradients & Foliage */}
+      {/* SVG Defs for Rose Gradients */}
       <svg className="absolute w-0 h-0" aria-hidden="true">
         <defs>
-          {/* Rose Petal Gradient - Richer, soft blush & velvet rose */}
+          {/* Rose Petal Gradient */}
           <linearGradient id="rosePetalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#881337" stopOpacity="0.52" />
-            <stop offset="50%" stopColor="#B83A5A" stopOpacity="0.38" />
-            <stop offset="100%" stopColor="#EAA8B6" stopOpacity="0.25" />
+            <stop offset="0%" stopColor="#881337" stopOpacity="0.6" />
+            <stop offset="50%" stopColor="#BA3458" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="#EFA4B5" stopOpacity="0.3" />
           </linearGradient>
+
+          {/* Full Blooming Velvet Rose Gradient */}
+          <radialGradient id="fullRoseBloomGrad" cx="45%" cy="45%" r="55%">
+            <stop offset="0%" stopColor="#A81D45" stopOpacity="0.9" />
+            <stop offset="45%" stopColor="#881337" stopOpacity="0.85" />
+            <stop offset="85%" stopColor="#55081E" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#360211" stopOpacity="0.75" />
+          </radialGradient>
 
           {/* Antique Gold Leaf Gradient */}
           <linearGradient id="goldLeafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -413,100 +456,26 @@ function BotanicalBackground() {
             <stop offset="60%" stopColor="#C9A464" stopOpacity="0.4" />
             <stop offset="100%" stopColor="#F5E4C2" stopOpacity="0.25" />
           </linearGradient>
-
-          {/* Blossom White/Gold Gradient */}
-          <radialGradient id="blossomGrad" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#B89358" stopOpacity="0.6" />
-            <stop offset="50%" stopColor="#F5ECE0" stopOpacity="0.45" />
-            <stop offset="100%" stopColor="#C0657B" stopOpacity="0.25" />
-          </radialGradient>
         </defs>
       </svg>
 
-      {/* Background Floral Medallion Watermark in Center */}
-      <div className="absolute top-32 left-1/2 -translate-x-1/2 w-[700px] h-[700px] pointer-events-none opacity-[0.06] text-[#881337]">
-        <svg viewBox="0 0 200 200" fill="none" className="w-full h-full animate-spin-slow">
-          <circle cx="100" cy="100" r="90" stroke="currentColor" strokeWidth="0.75" strokeDasharray="4 6" />
-          <circle cx="100" cy="100" r="75" stroke="currentColor" strokeWidth="0.5" />
-          {/* 8 Floral Petals radiating from center */}
-          {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
-            <g key={deg} transform={`rotate(${deg} 100 100)`}>
-              <path d="M 100 35 C 92 60, 92 80, 100 95 C 108 80, 108 60, 100 35 Z" fill="currentColor" />
-            </g>
-          ))}
-        </svg>
-      </div>
-
-      {/* 1. Subtle Etched Botanical Vines (Corner & Margin Accents) */}
-      <div className="absolute top-0 left-0 w-64 h-96 opacity-30 sm:opacity-40 text-[#B89358]">
-        <motion.svg
-          viewBox="0 0 200 300"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full"
-          animate={shouldReduceMotion ? {} : { rotate: [-0.8, 0.8, -0.8] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          style={{ transformOrigin: "top left" }}
-        >
-          {/* Cascading botanical bough */}
-          <path
-            d="M 10 -20 Q 40 80, 20 160 T 60 260"
-            stroke="currentColor"
-            strokeWidth="0.8"
-            strokeDasharray="2 3"
-          />
-          {/* Leaves along vine */}
-          <path d="M 22 50 C 45 40, 55 60, 25 70 C 20 60, 21 52, 22 50 Z" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="0.6" />
-          <path d="M 33 110 C 60 100, 70 125, 36 130 C 30 120, 31 112, 33 110 Z" fill="currentColor" fillOpacity="0.12" stroke="currentColor" strokeWidth="0.6" />
-          <path d="M 18 175 C -10 165, -15 190, 16 195 Z" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="0.6" />
-          <path d="M 38 220 C 65 210, 70 235, 42 240 Z" fill="currentColor" fillOpacity="0.12" stroke="currentColor" strokeWidth="0.6" />
-          {/* Small floral buds */}
-          <circle cx="56" cy="55" r="3" fill="#881337" fillOpacity="0.25" />
-          <circle cx="68" cy="115" r="3.5" fill="#881337" fillOpacity="0.22" />
-        </motion.svg>
-      </div>
-
-      <div className="absolute top-1/4 right-0 w-56 h-80 opacity-25 sm:opacity-35 text-[#B89358]">
-        <motion.svg
-          viewBox="0 0 180 260"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full"
-          animate={shouldReduceMotion ? {} : { rotate: [0.6, -0.6, 0.6] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-          style={{ transformOrigin: "top right" }}
-        >
-          <path
-            d="M 190 20 Q 130 90, 150 160 T 110 240"
-            stroke="currentColor"
-            strokeWidth="0.8"
-            strokeDasharray="3 3"
-          />
-          <path d="M 160 65 C 130 55, 120 78, 155 82 Z" fill="currentColor" fillOpacity="0.14" stroke="currentColor" strokeWidth="0.6" />
-          <path d="M 142 125 C 110 115, 105 140, 140 144 Z" fill="currentColor" fillOpacity="0.12" stroke="currentColor" strokeWidth="0.6" />
-          <path d="M 132 195 C 100 185, 95 210, 130 214 Z" fill="currentColor" fillOpacity="0.14" stroke="currentColor" strokeWidth="0.6" />
-          <circle cx="124" cy="70" r="3" fill="#881337" fillOpacity="0.2" />
-          <circle cx="102" cy="130" r="3.5" fill="#881337" fillOpacity="0.18" />
-        </motion.svg>
-      </div>
-
-      {/* 2. Floating Gentle Petals & Leaves */}
+      {/* Floating Gentle Velvet Roses & Petals */}
       {!shouldReduceMotion &&
         PETALS_CONFIG.map((p) => (
           <motion.div
             key={p.id}
-            className="absolute -top-12"
+            className="absolute -top-14"
             style={{
               left: p.left,
               width: p.size,
               height: p.size,
             }}
             animate={{
-              y: ["-40px", "115vh"],
+              y: ["-50px", "115vh"],
               x: [0, p.drift, -p.drift * 0.7, p.drift * 0.5, 0],
               rotate: [0, 140, 260, 360],
               rotateY: [0, 180, 360],
-              scale: [0.9, 1.08, 0.92, 1],
+              scale: [0.92, 1.06, 0.94, 1],
             }}
             transition={{
               duration: p.duration,
@@ -515,6 +484,42 @@ function BotanicalBackground() {
               ease: "linear",
             }}
           >
+            {p.type === "fullRose" && (
+              <svg viewBox="0 0 32 32" className="w-full h-full drop-shadow-sm">
+                {/* Outer cupped rose petals */}
+                <path
+                  d="M 16 3 C 23 3, 29 8, 29 16 C 29 23, 23 29, 16 29 C 9 29, 3 23, 3 16 C 3 8, 9 3, 16 3 Z"
+                  fill="url(#fullRoseBloomGrad)"
+                />
+                {/* Spiral layered petal highlights */}
+                <path
+                  d="M 9 14 C 9 8, 23 6, 24 14 C 25 21, 16 25, 11 23"
+                  stroke="#ECA0B2"
+                  strokeWidth="1"
+                  strokeLinecap="round"
+                  fill="none"
+                  strokeOpacity="0.9"
+                />
+                <path
+                  d="M 13 18 C 14 23, 22 22, 22 17 C 22 12, 15 12, 14 16"
+                  stroke="#F6C5D0"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  fill="none"
+                  strokeOpacity="0.95"
+                />
+                <circle cx="17" cy="16" r="2.2" fill="#FFF0F3" fillOpacity="0.9" />
+                {/* Antique gold calyx touch */}
+                <path
+                  d="M 16 29 Q 15 31 13 31 Q 16 30 17 31"
+                  stroke="#B89358"
+                  strokeWidth="0.8"
+                  strokeLinecap="round"
+                  strokeOpacity="0.7"
+                />
+              </svg>
+            )}
+
             {p.type === "rose" && (
               <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow-sm">
                 <path
@@ -531,17 +536,6 @@ function BotanicalBackground() {
                   fill="url(#goldLeafGrad)"
                 />
                 <line x1="12" y1="4" x2="12" y2="20" stroke="#B89358" strokeWidth="0.6" strokeOpacity="0.4" />
-              </svg>
-            )}
-
-            {p.type === "blossom" && (
-              <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow-sm">
-                {/* 4-petal delicate flower */}
-                <circle cx="12" cy="12" r="2.5" fill="#B89358" fillOpacity="0.4" />
-                <path d="M12 2 C10 6, 10 8, 12 9 C14 8, 14 6, 12 2 Z" fill="url(#blossomGrad)" />
-                <path d="M12 22 C10 18, 10 16, 12 15 C14 16, 14 18, 12 22 Z" fill="url(#blossomGrad)" />
-                <path d="M2 12 C6 10, 8 10, 9 12 C8 14, 6 14, 2 12 Z" fill="url(#blossomGrad)" />
-                <path d="M22 12 C18 10, 16 10, 15 12 C16 14, 18 14, 22 12 Z" fill="url(#blossomGrad)" />
               </svg>
             )}
           </motion.div>
@@ -1578,7 +1572,10 @@ function ForAllOurTomorrows() {
 
       {/* Closing Signature */}
       <div className="text-center mt-16 pt-10 border-t border-[#B89358]/25 space-y-2">
-        <InteractiveButterfly className="w-12 h-12 mx-auto mb-4" showWhisper={true} />
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <BotanicalRose className="w-10 h-10" />
+          <InteractiveButterfly className="w-11 h-11" showWhisper={true} />
+        </div>
         <p className="font-serif italic text-fluid-body text-[#1C1917]">
           Forever yours, with all my love, apology, and devotion,
         </p>

@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   motion,
   AnimatePresence,
   useScroll,
   useSpring,
+  useMotionValue,
+  useTransform,
   useReducedMotion,
 } from "framer-motion";
 
@@ -12,6 +14,180 @@ import {
    ═══════════════════════════════════════════════════════════════ */
 
 const EASE_OUT_QUART = [0.25, 1, 0.5, 1] as const;
+
+/* ═══════════════════════════════════════════════════════════════
+   AMBIENT ACOUSTIC MUSIC SYNTHESIZER (WEB AUDIO API)
+   Zero external dependencies, works seamlessly offline & on Vercel
+   ═══════════════════════════════════════════════════════════════ */
+
+class AmbientMusicBox {
+  private ctx: AudioContext | null = null;
+  private isPlaying = false;
+  private timer: number | null = null;
+  private noteIdx = 0;
+
+  // Soft, peaceful acoustic bell progression (F maj9 / D min9 / Bb maj7)
+  private melody = [
+    349.23, // F4
+    440.0,  // A4
+    523.25, // C5
+    659.25, // E5
+    587.33, // D5
+    440.0,  // A4
+    392.0,  // G4
+    523.25, // C5
+    466.16, // Bb4
+    392.0,  // G4
+    349.23, // F4
+    261.63, // C4
+    349.23, // F4
+    440.0,  // A4
+    392.0,  // G4
+    329.63, // E4
+  ];
+
+  start() {
+    if (this.isPlaying) return;
+    try {
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!AudioCtx) return;
+      this.ctx = new AudioCtx();
+      this.isPlaying = true;
+      this.scheduleNext();
+    } catch {
+      // AudioContext policy fallback
+    }
+  }
+
+  private scheduleNext = () => {
+    if (!this.isPlaying || !this.ctx) return;
+    const freq = this.melody[this.noteIdx];
+    this.noteIdx = (this.noteIdx + 1) % this.melody.length;
+    this.playTone(freq);
+    this.timer = window.setTimeout(this.scheduleNext, 1250);
+  };
+
+  private playTone(freq: number) {
+    if (!this.ctx || this.ctx.state === "suspended") return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, now);
+
+    // Warm, soft acoustic bell envelope
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.12, now + 0.08);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 1.85);
+  }
+
+  stop() {
+    this.isPlaying = false;
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+    if (this.ctx) {
+      this.ctx.close();
+      this.ctx = null;
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LIVE TIME HOOK: COUNTING EVERY SECOND SINCE NIKKAH
+   ═══════════════════════════════════════════════════════════════ */
+
+function useLiveMarriageDuration() {
+  const nikkahTime = useRef(new Date("2026-07-13T10:00:00+05:30").getTime());
+  const [duration, setDuration] = useState({
+    days: 52,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
+  useEffect(() => {
+    const update = () => {
+      const now = Date.now();
+      const diff = Math.max(0, now - nikkahTime.current);
+      const days = Math.max(52, Math.floor(diff / (1000 * 60 * 60 * 24)));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+      setDuration({ days, hours, minutes, seconds });
+    };
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return duration;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TACTILE 3D PAPER TILT CARD
+   ═══════════════════════════════════════════════════════════════ */
+
+function TiltFrame({
+  children,
+  className = "",
+  onClick,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+}) {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const shouldReduceMotion = useReducedMotion();
+
+  const mouseXSpring = useSpring(x, { stiffness: 140, damping: 22 });
+  const mouseYSpring = useSpring(y, { stiffness: 140, damping: 22 });
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["5deg", "-5deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-5deg", "5deg"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (shouldReduceMotion) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    x.set(mouseX / rect.width - 0.5);
+    y.set(mouseY / rect.height - 0.5);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      style={{
+        perspective: 1000,
+        rotateX: shouldReduceMotion ? 0 : rotateX,
+        rotateY: shouldReduceMotion ? 0 : rotateY,
+        transformStyle: "preserve-3d",
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onClick={onClick}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 /* ═══════════════════════════════════════════════════════════════
    BESPOKE GOLD MOTIFS & DIVIDERS
@@ -37,56 +213,97 @@ function GoldKnotIcon({ className = "" }: { className?: string }) {
   );
 }
 
-function GoldButterfly({ className = "" }: { className?: string }) {
+function InteractiveButterfly({
+  className = "",
+  showWhisper = false,
+}: {
+  className?: string;
+  showWhisper?: boolean;
+}) {
+  const [isFluttering, setIsFluttering] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
+  const handleFlutter = () => {
+    setIsFluttering(true);
+    setTimeout(() => setIsFluttering(false), 1400);
+  };
+
   return (
-    <motion.svg
-      viewBox="0 0 60 60"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-hidden="true"
-      animate={
-        shouldReduceMotion
-          ? {}
-          : {
-              scale: [1, 1.06, 1],
-              opacity: [0.85, 1, 0.85],
-            }
-      }
-      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-    >
-      <path
-        d="M30 30 C22 12, 4 10, 7 26 C9 35, 20 36, 30 30Z"
-        fill="#881337"
-        fillOpacity="0.08"
-        stroke="#B89358"
-        strokeWidth="0.9"
-      />
-      <path
-        d="M30 30 C38 12, 56 10, 53 26 C51 35, 40 36, 30 30Z"
-        fill="#881337"
-        fillOpacity="0.08"
-        stroke="#B89358"
-        strokeWidth="0.9"
-      />
-      <path
-        d="M30 30 C22 36, 6 44, 12 34 C15 30, 24 30, 30 30Z"
-        fill="#1C1917"
-        fillOpacity="0.05"
-        stroke="#B89358"
-        strokeWidth="0.75"
-      />
-      <path
-        d="M30 30 C38 36, 54 44, 48 34 C45 30, 36 30, 30 30Z"
-        fill="#1C1917"
-        fillOpacity="0.05"
-        stroke="#B89358"
-        strokeWidth="0.75"
-      />
-      <line x1="30" y1="22" x2="30" y2="38" stroke="#881337" strokeWidth="1.2" strokeLinecap="round" />
-    </motion.svg>
+    <div className="relative inline-block group">
+      <motion.svg
+        viewBox="0 0 60 60"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={`${className} cursor-pointer`}
+        aria-label="Gold butterfly - tap to flutter"
+        role="button"
+        tabIndex={0}
+        onClick={handleFlutter}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") handleFlutter();
+        }}
+        animate={
+          isFluttering
+            ? {
+                scale: [1, 1.25, 0.95, 1.15, 1],
+                rotate: [0, -12, 12, -6, 0],
+              }
+            : shouldReduceMotion
+              ? {}
+              : {
+                  scale: [1, 1.05, 1],
+                  opacity: [0.85, 1, 0.85],
+                }
+        }
+        transition={{ duration: isFluttering ? 0.9 : 4, repeat: isFluttering ? 0 : Infinity, ease: "easeInOut" }}
+      >
+        <path
+          d="M30 30 C22 12, 4 10, 7 26 C9 35, 20 36, 30 30Z"
+          fill="#881337"
+          fillOpacity="0.08"
+          stroke="#B89358"
+          strokeWidth="0.9"
+        />
+        <path
+          d="M30 30 C38 12, 56 10, 53 26 C51 35, 40 36, 30 30Z"
+          fill="#881337"
+          fillOpacity="0.08"
+          stroke="#B89358"
+          strokeWidth="0.9"
+        />
+        <path
+          d="M30 30 C22 36, 6 44, 12 34 C15 30, 24 30, 30 30Z"
+          fill="#1C1917"
+          fillOpacity="0.05"
+          stroke="#B89358"
+          strokeWidth="0.75"
+        />
+        <path
+          d="M30 30 C38 36, 54 44, 48 34 C45 30, 36 30, 30 30Z"
+          fill="#1C1917"
+          fillOpacity="0.05"
+          stroke="#B89358"
+          strokeWidth="0.75"
+        />
+        <line x1="30" y1="22" x2="30" y2="38" stroke="#881337" strokeWidth="1.2" strokeLinecap="round" />
+      </motion.svg>
+
+      {/* Whispering Tooltip */}
+      {showWhisper && (
+        <AnimatePresence>
+          {isFluttering && (
+            <motion.div
+              initial={{ opacity: 0, y: 8, scale: 0.9 }}
+              animate={{ opacity: 1, y: -2, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.9 }}
+              className="absolute left-1/2 -translate-x-1/2 -top-10 whitespace-nowrap bg-[#881337] text-white text-[11px] font-sans px-3 py-1 rounded-full shadow-lg pointer-events-none z-30"
+            >
+              My steadfast love, today and always ❦
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
+    </div>
   );
 }
 
@@ -117,13 +334,19 @@ interface LightboxState {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   TOP NAVIGATION BAR (EDITORIAL BRANDING)
+   TOP NAVIGATION BAR (EDITORIAL BRANDING & AUDIO TOGGLE)
    ═══════════════════════════════════════════════════════════════ */
 
-function EditorialNav() {
+function EditorialNav({
+  isPlayingAudio,
+  onToggleAudio,
+}: {
+  isPlayingAudio: boolean;
+  onToggleAudio: () => void;
+}) {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-40 bg-[#FAF8F5]/90 backdrop-blur-md border-b border-[#EADFD4]/70 px-6 sm:px-12 py-3.5">
-      <div className="max-w-6xl mx-auto flex items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-40 bg-[#FAF8F5]/90 backdrop-blur-md border-b border-[#EADFD4]/70 px-4 sm:px-12 py-3.5">
+      <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
         {/* Monogram */}
         <div className="flex items-center gap-2.5">
           <GoldKnotIcon className="w-6 h-6 text-[#B89358]" />
@@ -133,14 +356,38 @@ function EditorialNav() {
         </div>
 
         {/* Timeline Indicator */}
-        <div className="hidden sm:flex items-center gap-2.5 font-sans text-xs tracking-[0.25em] uppercase text-[#881337] bg-[#FAF3EA] px-4 py-1.5 rounded-full border border-[#E8DCCF]">
+        <div className="hidden lg:flex items-center gap-2.5 font-sans text-xs tracking-[0.25em] uppercase text-[#881337] bg-[#FAF3EA] px-4 py-1.5 rounded-full border border-[#E8DCCF]">
           <span className="w-1.5 h-1.5 rounded-full bg-[#881337] animate-pulse" />
           <span>July 13, 2026 • 52 Days As Husband & Wife</span>
         </div>
 
-        {/* Occasion */}
-        <div className="font-sans text-[11px] sm:text-xs tracking-[0.2em] uppercase text-[#786C5E] font-medium">
-          September 3 • Sifana’s Birthday
+        {/* Right Action: Ambient Audio Toggle & Date */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onToggleAudio}
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border transition-all text-xs font-sans tracking-wider cursor-pointer ${
+              isPlayingAudio
+                ? "bg-[#881337] text-white border-[#881337] shadow-sm"
+                : "bg-white/80 hover:bg-[#FAF3EA] text-[#881337] border-[#B89358]/50"
+            }`}
+            aria-label={isPlayingAudio ? "Pause ambient melody" : "Play ambient acoustic melody"}
+          >
+            <span className="text-xs">{isPlayingAudio ? "⏸" : "♫"}</span>
+            <span className="text-[11px] font-medium hidden sm:inline">
+              {isPlayingAudio ? "Melody Playing" : "Play Melody"}
+            </span>
+            {isPlayingAudio && (
+              <span className="flex items-center gap-0.5 h-2.5">
+                <span className="w-0.5 h-2 bg-white animate-pulse" />
+                <span className="w-0.5 h-3 bg-white animate-pulse delay-75" />
+                <span className="w-0.5 h-1.5 bg-white animate-pulse delay-150" />
+              </span>
+            )}
+          </button>
+
+          <span className="font-sans text-[11px] sm:text-xs tracking-[0.2em] uppercase text-[#786C5E] font-medium hidden sm:inline">
+            September 3 • Sifana’s Birthday
+          </span>
         </div>
       </div>
     </nav>
@@ -149,7 +396,6 @@ function EditorialNav() {
 
 /* ═══════════════════════════════════════════════════════════════
    HERO SECTION: BOLD, ASYMMETRICAL EDITORIAL LAYOUT
-   Directly inspired by knotsandcraft.webflow.io hero
    ═══════════════════════════════════════════════════════════════ */
 
 function EditorialHero({ onPhotoClick }: { onPhotoClick: (item: LightboxState) => void }) {
@@ -225,14 +471,14 @@ function EditorialHero({ onPhotoClick }: { onPhotoClick: (item: LightboxState) =
           </motion.div>
         </div>
 
-        {/* Right Column: Sifana's Radiant Portrait (Arched luxury container) */}
+        {/* Right Column: Sifana's Radiant Portrait with 3D Tilt */}
         <motion.div
           className="lg:col-span-5 relative"
           initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.95, y: 25 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 1.3, delay: 0.5, ease: EASE_OUT_QUART }}
         >
-          <div
+          <TiltFrame
             className="editorial-frame rounded-t-[10rem] rounded-b-3xl cursor-pointer group relative shadow-2xl"
             onClick={() =>
               onPhotoClick({
@@ -264,7 +510,7 @@ function EditorialHero({ onPhotoClick }: { onPhotoClick: (item: LightboxState) =
                 My Beautiful Wife
               </span>
             </div>
-          </div>
+          </TiltFrame>
         </motion.div>
       </div>
 
@@ -285,30 +531,43 @@ function EditorialHero({ onPhotoClick }: { onPhotoClick: (item: LightboxState) =
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   DELIGHT STATS: 51 DAYS OF SACRED UNION
-   Acknowledges the exact 2-month timeline intimately
+   DELIGHT 1: THE LIVE SACRED TICKER (DAY 52 & COUNTING EVERY SECOND)
    ═══════════════════════════════════════════════════════════════ */
 
 function SacredUnionTimeline() {
-  const stats = [
-    { label: "Our Nikkah", val: "July 13", sub: "The Day We Began" },
-    { label: "Days as Husband & Wife", val: "52", sub: "And Every Single Tomorrow" },
-    { label: "My Promise to You", val: "Steadfast", sub: "Choosing You Every Morning" },
-    { label: "My Prayers For Us", val: "Sakinah", sub: "Peace, Love & Barakah" },
+  const duration = useLiveMarriageDuration();
+
+  const timeUnits = [
+    { label: "Days", val: duration.days, sub: "Since July 13, 2026" },
+    { label: "Hours", val: String(duration.hours).padStart(2, "0"), sub: "Of Shared Vows" },
+    { label: "Minutes", val: String(duration.minutes).padStart(2, "0"), sub: "Choosing You" },
+    { label: "Seconds", val: String(duration.seconds).padStart(2, "0"), sub: "And Counting..." },
   ];
 
   return (
     <section className="py-12 px-6 sm:px-12 max-w-5xl mx-auto border-y border-[#EADFD4]/80">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-        {stats.map((s, i) => (
-          <div key={i} className="p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-[#E8DCCF]/60">
+      <div className="text-center mb-6">
+        <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#881337] font-semibold block">
+          Our Sacred Journey
+        </span>
+        <p className="font-serif italic text-sm sm:text-base text-[#5C4F44] mt-1">
+          Counting every single second as husband and wife — until eternity.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
+        {timeUnits.map((s, i) => (
+          <div
+            key={i}
+            className="p-5 bg-white/70 backdrop-blur-sm rounded-2xl border border-[#E8DCCF]/70 shadow-sm"
+          >
             <span className="font-sans text-[10px] tracking-[0.25em] uppercase text-[#786C5E] font-semibold block mb-1">
               {s.label}
             </span>
-            <span className="font-display text-2xl sm:text-3xl text-[#881337] font-medium block">
+            <span className="font-display text-3xl sm:text-4xl text-[#881337] font-normal block font-variant-numeric tabular-nums">
               {s.val}
             </span>
-            <span className="font-serif italic text-xs text-[#5C4F44] block mt-1">
+            <span className="font-serif italic text-xs text-[#786C5E] block mt-1">
               {s.sub}
             </span>
           </div>
@@ -320,7 +579,6 @@ function SacredUnionTimeline() {
 
 /* ═══════════════════════════════════════════════════════════════
    CHAPTER I: THE APOLOGY & THE STEPPING INTO OUR LIFE
-   Two-column editorial spread with photo on steps
    ═══════════════════════════════════════════════════════════════ */
 
 function ChapterOneApology({ onPhotoClick }: { onPhotoClick: (item: LightboxState) => void }) {
@@ -331,7 +589,7 @@ function ChapterOneApology({ onPhotoClick }: { onPhotoClick: (item: LightboxStat
       <SectionDivider label="Chapter I" />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-        {/* Left Column: Photo of them stepping down together */}
+        {/* Left Column: Photo of them stepping down together with 3D tilt */}
         <motion.div
           className="lg:col-span-5"
           initial={shouldReduceMotion ? false : { opacity: 0, x: -30 }}
@@ -339,7 +597,7 @@ function ChapterOneApology({ onPhotoClick }: { onPhotoClick: (item: LightboxStat
           viewport={{ once: true, amount: 0.25 }}
           transition={{ duration: 1.1, ease: EASE_OUT_QUART }}
         >
-          <div
+          <TiltFrame
             className="editorial-frame relative group cursor-pointer shadow-xl"
             onClick={() =>
               onPhotoClick({
@@ -368,7 +626,7 @@ function ChapterOneApology({ onPhotoClick }: { onPhotoClick: (item: LightboxStat
             <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-[9px] font-sans tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity">
               Tap to expand
             </div>
-          </div>
+          </TiltFrame>
         </motion.div>
 
         {/* Right Column: The Words of Apology */}
@@ -414,7 +672,6 @@ function ChapterOneApology({ onPhotoClick }: { onPhotoClick: (item: LightboxStat
 
 /* ═══════════════════════════════════════════════════════════════
    CHAPTER II: THE GRIEF & CLASPED HENNA HANDS
-   Reflective spread pairing the grief words with the macro hands photo
    ═══════════════════════════════════════════════════════════════ */
 
 function ChapterTwoGrief({ onPhotoClick }: { onPhotoClick: (item: LightboxState) => void }) {
@@ -471,7 +728,7 @@ function ChapterTwoGrief({ onPhotoClick }: { onPhotoClick: (item: LightboxState)
             </p>
           </motion.div>
 
-          {/* Right: Macro Photo of Clasped Hands & Henna */}
+          {/* Right: Macro Photo of Clasped Hands & Henna with 3D Tilt */}
           <motion.div
             className="lg:col-span-5"
             initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.95 }}
@@ -479,7 +736,7 @@ function ChapterTwoGrief({ onPhotoClick }: { onPhotoClick: (item: LightboxState)
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 1.2, ease: EASE_OUT_QUART }}
           >
-            <div
+            <TiltFrame
               className="editorial-frame relative group cursor-pointer shadow-xl"
               onClick={() =>
                 onPhotoClick({
@@ -507,7 +764,7 @@ function ChapterTwoGrief({ onPhotoClick }: { onPhotoClick: (item: LightboxState)
               <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-[9px] font-sans tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity">
                 Tap to expand
               </div>
-            </div>
+            </TiltFrame>
           </motion.div>
         </div>
       </div>
@@ -516,8 +773,7 @@ function ChapterTwoGrief({ onPhotoClick }: { onPhotoClick: (item: LightboxState)
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   CHAPTER III: MY BUTTERFLY IN THE GARDEN
-   Asymmetric editorial spread celebrating Sifana
+   CHAPTER III: MY BUTTERFLY IN THE GARDEN (WITH WHISPER DELIGHT)
    ═══════════════════════════════════════════════════════════════ */
 
 function ChapterThreeButterfly({ onPhotoClick }: { onPhotoClick: (item: LightboxState) => void }) {
@@ -528,7 +784,7 @@ function ChapterThreeButterfly({ onPhotoClick }: { onPhotoClick: (item: Lightbox
       <SectionDivider label="Chapter III" />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-        {/* Left: Sifana in the Garden Photo */}
+        {/* Left: Sifana in the Garden Photo with 3D Tilt */}
         <motion.div
           className="lg:col-span-5 order-2 lg:order-1"
           initial={shouldReduceMotion ? false : { opacity: 0, x: -30 }}
@@ -536,7 +792,7 @@ function ChapterThreeButterfly({ onPhotoClick }: { onPhotoClick: (item: Lightbox
           viewport={{ once: true, amount: 0.25 }}
           transition={{ duration: 1.1, ease: EASE_OUT_QUART }}
         >
-          <div
+          <TiltFrame
             className="editorial-frame relative group cursor-pointer shadow-xl"
             onClick={() =>
               onPhotoClick({
@@ -564,7 +820,7 @@ function ChapterThreeButterfly({ onPhotoClick }: { onPhotoClick: (item: Lightbox
             <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-[9px] font-sans tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity">
               Tap to expand
             </div>
-          </div>
+          </TiltFrame>
         </motion.div>
 
         {/* Right: The Words of Reassurance & Devotion */}
@@ -599,13 +855,13 @@ function ChapterThreeButterfly({ onPhotoClick }: { onPhotoClick: (item: Lightbox
           </div>
 
           <div className="pt-4 flex items-center gap-4">
-            <GoldButterfly className="w-12 h-12 flex-shrink-0" />
+            <InteractiveButterfly className="w-14 h-14 flex-shrink-0" showWhisper={true} />
             <div>
               <h3 className="font-display text-fluid-h3 text-[#881337] font-normal tracking-tight">
                 Happy birthday, My butterfly.
               </h3>
               <span className="font-sans text-xs tracking-[0.2em] uppercase text-[#786C5E]">
-                With every piece of my heart
+                Tap the butterfly • With every piece of my heart
               </span>
             </div>
           </div>
@@ -617,7 +873,6 @@ function ChapterThreeButterfly({ onPhotoClick }: { onPhotoClick: (item: Lightbox
 
 /* ═══════════════════════════════════════════════════════════════
    CHAPTER IV: JULY 13TH, 2026 & OUR SACRED DU'A
-   Wide portrait of the couple together (fixed top crop) with blessing
    ═══════════════════════════════════════════════════════════════ */
 
 function ChapterFourBlessing({ onPhotoClick }: { onPhotoClick: (item: LightboxState) => void }) {
@@ -628,41 +883,45 @@ function ChapterFourBlessing({ onPhotoClick }: { onPhotoClick: (item: LightboxSt
       <div className="max-w-5xl mx-auto text-center space-y-12">
         <SectionDivider label="Chapter IV" />
 
-        {/* Big Portrait of Sanoof & Sifana Together */}
+        {/* Big Portrait of Sanoof & Sifana Together with 3D Tilt */}
         <motion.div
-          className="max-w-3xl mx-auto editorial-frame shadow-2xl relative group cursor-pointer"
+          className="max-w-3xl mx-auto"
           initial={shouldReduceMotion ? false : { opacity: 0, y: 35 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 1.2, ease: EASE_OUT_QUART }}
-          onClick={() =>
-            onPhotoClick({
-              src: "/photos/together-portrait.jpg",
-              alt: "Sanoof and Sifana standing together peacefully on their Nikkah day",
-              caption: "July 13, 2026 — Muhammed Sanoof & Sifana. May Allah bless our marriage with love, understanding and sakinah.",
-            })
-          }
         >
-          <img
-            src="/photos/together-portrait.jpg"
-            alt="Sanoof and Sifana standing together peacefully on their Nikkah day"
-            loading="lazy"
-            decoding="async"
-            className="w-full aspect-[4/5] sm:aspect-[16/11] object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
-          />
+          <TiltFrame
+            className="editorial-frame shadow-2xl relative group cursor-pointer"
+            onClick={() =>
+              onPhotoClick({
+                src: "/photos/together-portrait.jpg",
+                alt: "Sanoof and Sifana standing together peacefully on their Nikkah day",
+                caption: "July 13, 2026 — Muhammed Sanoof & Sifana. May Allah bless our marriage with love, understanding and sakinah.",
+              })
+            }
+          >
+            <img
+              src="/photos/together-portrait.jpg"
+              alt="Sanoof and Sifana standing together peacefully on their Nikkah day"
+              loading="lazy"
+              decoding="async"
+              className="w-full aspect-[4/5] sm:aspect-[16/11] object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+            />
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-          <div className="absolute bottom-6 left-6 right-6 text-white text-center">
-            <span className="font-sans text-[11px] tracking-[0.3em] uppercase text-[#F5EFE6]/90 block mb-1">
-              July 13, 2026 • Muhammed Sanoof & Sifana
-            </span>
-            <p className="font-serif italic text-lg sm:text-xl">
-              “Bless our marriage with love, understanding and sakinah.”
-            </p>
-          </div>
-          <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-[9px] font-sans tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity">
-            Tap to expand
-          </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute bottom-6 left-6 right-6 text-white text-center">
+              <span className="font-sans text-[11px] tracking-[0.3em] uppercase text-[#F5EFE6]/90 block mb-1">
+                July 13, 2026 • Muhammed Sanoof & Sifana
+              </span>
+              <p className="font-serif italic text-lg sm:text-xl">
+                “Bless our marriage with love, understanding and sakinah.”
+              </p>
+            </div>
+            <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-[9px] font-sans tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity">
+              Tap to expand
+            </div>
+          </TiltFrame>
         </motion.div>
 
         {/* Du'a and Vow */}
@@ -697,8 +956,102 @@ function ChapterFourBlessing({ onPhotoClick }: { onPhotoClick: (item: LightboxSt
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   DELIGHT 2: "MAKE A BIRTHDAY WISH" CANDLE RITUAL
+   ═══════════════════════════════════════════════════════════════ */
+
+function BirthdayCandleRitual() {
+  const [wishSealed, setWishSealed] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
+
+  const handleMakeWish = () => {
+    setWishSealed(true);
+  };
+
+  return (
+    <div className="my-16 p-8 sm:p-10 bg-white/75 border border-[#EADFD4] rounded-3xl text-center space-y-5 shadow-sm relative overflow-hidden">
+      {/* Background warm shimmer */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#FAF3EA]/40 to-transparent pointer-events-none" />
+
+      <div className="relative z-10 space-y-4">
+        <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#881337] font-semibold block">
+          A Birthday Ritual
+        </span>
+        <h3 className="font-display text-fluid-h3 text-[#1C1917] font-normal">
+          Make a Wish, My Butterfly
+        </h3>
+
+        {!wishSealed ? (
+          <>
+            <p className="font-serif italic text-fluid-body text-[#5C4F44] max-w-md mx-auto leading-relaxed">
+              Close your eyes, make a silent wish for our home and marriage, then tap the flame to seal your prayer.
+            </p>
+
+            {/* Candle with Flickering Flame */}
+            <div className="pt-4 flex justify-center">
+              <button
+                onClick={handleMakeWish}
+                className="group flex flex-col items-center cursor-pointer p-3 rounded-2xl hover:bg-[#FAF3EA]/50 transition-colors focus:outline-none"
+                aria-label="Tap flame to make a birthday wish"
+              >
+                {/* Flame */}
+                <motion.div
+                  className="w-7 h-10 relative mb-1"
+                  animate={
+                    shouldReduceMotion
+                      ? {}
+                      : {
+                          scaleY: [1, 1.15, 0.95, 1.1, 1],
+                          scaleX: [1, 0.92, 1.08, 0.95, 1],
+                          rotate: [-2, 2, -1, 3, 0],
+                        }
+                  }
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  {/* Glow Aura */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#B89358] to-[#FFD580] rounded-full blur-sm opacity-70 group-hover:opacity-100 transition-opacity" />
+                  {/* Inner flame */}
+                  <div className="absolute inset-x-1 bottom-0 top-1 bg-gradient-to-t from-[#881337] via-[#B89358] to-white rounded-full" />
+                </motion.div>
+
+                {/* Candle Body */}
+                <div className="w-6 h-12 bg-gradient-to-b from-[#F6EDE2] to-[#E5D7C7] rounded-sm border border-[#D5C5B3]/60 shadow-inner" />
+
+                <span className="font-sans text-[10px] tracking-widest uppercase text-[#881337] font-semibold mt-3 group-hover:text-[#6a0e2a] transition-colors">
+                  Tap to Seal Wish
+                </span>
+              </button>
+            </div>
+          </>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: EASE_OUT_QUART }}
+            className="p-6 bg-[#FAF3EA]/80 rounded-2xl border border-[#B89358]/30 space-y-3 max-w-lg mx-auto"
+          >
+            <span className="font-serif italic text-sm text-[#881337] block">
+              بسم الله الرحمن الرحيم
+            </span>
+            <p className="font-display text-fluid-lead text-[#1C1917] font-normal leading-relaxed">
+              “May Allah answer every silent prayer of your heart, preserve the light in your eyes, and fill our marriage with everlasting sakinah and joy. Ameen.”
+            </p>
+            <div className="pt-2">
+              <button
+                onClick={() => setWishSealed(false)}
+                className="font-sans text-[10px] tracking-[0.2em] uppercase text-[#786C5E] hover:text-[#1C1917] underline underline-offset-4 cursor-pointer"
+              >
+                Relight Candle
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
    CHAPTER V: "FOR ALL OUR TOMORROWS"
-   Interactive keepsake with 3 promises and tap-to-send love note
    ═══════════════════════════════════════════════════════════════ */
 
 interface PromiseItem {
@@ -820,9 +1173,12 @@ function ForAllOurTomorrows() {
         })}
       </div>
 
+      {/* Birthday Wish Candle Ritual */}
+      <BirthdayCandleRitual />
+
       {/* Closing Signature */}
       <div className="text-center mt-16 pt-10 border-t border-[#B89358]/25 space-y-2">
-        <GoldButterfly className="w-12 h-12 mx-auto mb-4" />
+        <InteractiveButterfly className="w-12 h-12 mx-auto mb-4" showWhisper={true} />
         <p className="font-serif italic text-fluid-body text-[#1C1917]">
           Forever yours, with all my love, apology, and devotion,
         </p>
@@ -848,7 +1204,7 @@ function LightboxModal({
   lightbox: LightboxState | null;
   onClose: () => void;
 }) {
-  React.useEffect(() => {
+  useEffect(() => {
     if (!lightbox) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -913,7 +1269,7 @@ function ScrollCompanion() {
     restDelta: 0.001,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     return scrollYProgress.on("change", (v) => {
       setShowTop(v > 0.25);
     });
@@ -958,10 +1314,35 @@ function ScrollCompanion() {
 
 export default function App() {
   const [activeLightbox, setActiveLightbox] = useState<LightboxState | null>(null);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const musicBoxRef = useRef<AmbientMusicBox | null>(null);
+
+  useEffect(() => {
+    musicBoxRef.current = new AmbientMusicBox();
+    return () => {
+      if (musicBoxRef.current) {
+        musicBoxRef.current.stop();
+      }
+    };
+  }, []);
+
+  const handleToggleAudio = () => {
+    if (!musicBoxRef.current) return;
+    if (isPlayingAudio) {
+      musicBoxRef.current.stop();
+      setIsPlayingAudio(false);
+    } else {
+      musicBoxRef.current.start();
+      setIsPlayingAudio(true);
+    }
+  };
 
   return (
     <div className="min-h-screen relative font-serif text-[#1C1917] bg-[#FAF8F5] selection:bg-[#881337]/15">
-      <EditorialNav />
+      <EditorialNav
+        isPlayingAudio={isPlayingAudio}
+        onToggleAudio={handleToggleAudio}
+      />
       <ScrollCompanion />
 
       <main className="relative z-10">

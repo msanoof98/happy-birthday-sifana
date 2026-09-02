@@ -361,6 +361,196 @@ function SectionDivider({ label }: { label?: string }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   SUBTLE BOTANICAL & FLORAL BACKGROUND ANIMATION
+   ═══════════════════════════════════════════════════════════════ */
+
+interface PetalConfig {
+  id: number;
+  left: string;
+  size: number;
+  duration: number;
+  delay: number;
+  type: "rose" | "goldLeaf" | "blossom";
+  drift: number;
+}
+
+const PETALS_CONFIG: PetalConfig[] = [
+  { id: 1, left: "5%", size: 20, duration: 22, delay: 0, type: "rose", drift: 24 },
+  { id: 2, left: "14%", size: 16, duration: 28, delay: 6, type: "goldLeaf", drift: -20 },
+  { id: 3, left: "25%", size: 24, duration: 20, delay: 11, type: "blossom", drift: 18 },
+  { id: 4, left: "36%", size: 18, duration: 25, delay: 3, type: "rose", drift: -22 },
+  { id: 5, left: "47%", size: 22, duration: 23, delay: 14, type: "goldLeaf", drift: 26 },
+  { id: 6, left: "58%", size: 15, duration: 27, delay: 8, type: "blossom", drift: -16 },
+  { id: 7, left: "69%", size: 22, duration: 21, delay: 1, type: "rose", drift: 22 },
+  { id: 8, left: "80%", size: 17, duration: 26, delay: 16, type: "goldLeaf", drift: -24 },
+  { id: 9, left: "91%", size: 25, duration: 19, delay: 5, type: "rose", drift: 15 },
+  { id: 10, left: "10%", size: 21, duration: 24, delay: 18, type: "blossom", drift: 20 },
+  { id: 11, left: "53%", size: 16, duration: 30, delay: 10, type: "rose", drift: -18 },
+  { id: 12, left: "86%", size: 19, duration: 22, delay: 13, type: "blossom", drift: 25 },
+];
+
+function BotanicalBackground() {
+  const shouldReduceMotion = useReducedMotion();
+
+  return (
+    <div
+      className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none"
+      aria-hidden="true"
+    >
+      {/* SVG Defs for Petal Gradients & Foliage */}
+      <svg className="absolute w-0 h-0" aria-hidden="true">
+        <defs>
+          {/* Rose Petal Gradient - Richer, soft blush & velvet rose */}
+          <linearGradient id="rosePetalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#881337" stopOpacity="0.52" />
+            <stop offset="50%" stopColor="#B83A5A" stopOpacity="0.38" />
+            <stop offset="100%" stopColor="#EAA8B6" stopOpacity="0.25" />
+          </linearGradient>
+
+          {/* Antique Gold Leaf Gradient */}
+          <linearGradient id="goldLeafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#9C7738" stopOpacity="0.55" />
+            <stop offset="60%" stopColor="#C9A464" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#F5E4C2" stopOpacity="0.25" />
+          </linearGradient>
+
+          {/* Blossom White/Gold Gradient */}
+          <radialGradient id="blossomGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#B89358" stopOpacity="0.6" />
+            <stop offset="50%" stopColor="#F5ECE0" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="#C0657B" stopOpacity="0.25" />
+          </radialGradient>
+        </defs>
+      </svg>
+
+      {/* Background Floral Medallion Watermark in Center */}
+      <div className="absolute top-32 left-1/2 -translate-x-1/2 w-[700px] h-[700px] pointer-events-none opacity-[0.06] text-[#881337]">
+        <svg viewBox="0 0 200 200" fill="none" className="w-full h-full animate-spin-slow">
+          <circle cx="100" cy="100" r="90" stroke="currentColor" strokeWidth="0.75" strokeDasharray="4 6" />
+          <circle cx="100" cy="100" r="75" stroke="currentColor" strokeWidth="0.5" />
+          {/* 8 Floral Petals radiating from center */}
+          {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
+            <g key={deg} transform={`rotate(${deg} 100 100)`}>
+              <path d="M 100 35 C 92 60, 92 80, 100 95 C 108 80, 108 60, 100 35 Z" fill="currentColor" />
+            </g>
+          ))}
+        </svg>
+      </div>
+
+      {/* 1. Subtle Etched Botanical Vines (Corner & Margin Accents) */}
+      <div className="absolute top-0 left-0 w-64 h-96 opacity-30 sm:opacity-40 text-[#B89358]">
+        <motion.svg
+          viewBox="0 0 200 300"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full h-full"
+          animate={shouldReduceMotion ? {} : { rotate: [-0.8, 0.8, -0.8] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          style={{ transformOrigin: "top left" }}
+        >
+          {/* Cascading botanical bough */}
+          <path
+            d="M 10 -20 Q 40 80, 20 160 T 60 260"
+            stroke="currentColor"
+            strokeWidth="0.8"
+            strokeDasharray="2 3"
+          />
+          {/* Leaves along vine */}
+          <path d="M 22 50 C 45 40, 55 60, 25 70 C 20 60, 21 52, 22 50 Z" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="0.6" />
+          <path d="M 33 110 C 60 100, 70 125, 36 130 C 30 120, 31 112, 33 110 Z" fill="currentColor" fillOpacity="0.12" stroke="currentColor" strokeWidth="0.6" />
+          <path d="M 18 175 C -10 165, -15 190, 16 195 Z" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="0.6" />
+          <path d="M 38 220 C 65 210, 70 235, 42 240 Z" fill="currentColor" fillOpacity="0.12" stroke="currentColor" strokeWidth="0.6" />
+          {/* Small floral buds */}
+          <circle cx="56" cy="55" r="3" fill="#881337" fillOpacity="0.25" />
+          <circle cx="68" cy="115" r="3.5" fill="#881337" fillOpacity="0.22" />
+        </motion.svg>
+      </div>
+
+      <div className="absolute top-1/4 right-0 w-56 h-80 opacity-25 sm:opacity-35 text-[#B89358]">
+        <motion.svg
+          viewBox="0 0 180 260"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full h-full"
+          animate={shouldReduceMotion ? {} : { rotate: [0.6, -0.6, 0.6] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+          style={{ transformOrigin: "top right" }}
+        >
+          <path
+            d="M 190 20 Q 130 90, 150 160 T 110 240"
+            stroke="currentColor"
+            strokeWidth="0.8"
+            strokeDasharray="3 3"
+          />
+          <path d="M 160 65 C 130 55, 120 78, 155 82 Z" fill="currentColor" fillOpacity="0.14" stroke="currentColor" strokeWidth="0.6" />
+          <path d="M 142 125 C 110 115, 105 140, 140 144 Z" fill="currentColor" fillOpacity="0.12" stroke="currentColor" strokeWidth="0.6" />
+          <path d="M 132 195 C 100 185, 95 210, 130 214 Z" fill="currentColor" fillOpacity="0.14" stroke="currentColor" strokeWidth="0.6" />
+          <circle cx="124" cy="70" r="3" fill="#881337" fillOpacity="0.2" />
+          <circle cx="102" cy="130" r="3.5" fill="#881337" fillOpacity="0.18" />
+        </motion.svg>
+      </div>
+
+      {/* 2. Floating Gentle Petals & Leaves */}
+      {!shouldReduceMotion &&
+        PETALS_CONFIG.map((p) => (
+          <motion.div
+            key={p.id}
+            className="absolute -top-12"
+            style={{
+              left: p.left,
+              width: p.size,
+              height: p.size,
+            }}
+            animate={{
+              y: ["-40px", "115vh"],
+              x: [0, p.drift, -p.drift * 0.7, p.drift * 0.5, 0],
+              rotate: [0, 140, 260, 360],
+              rotateY: [0, 180, 360],
+              scale: [0.9, 1.08, 0.92, 1],
+            }}
+            transition={{
+              duration: p.duration,
+              repeat: Infinity,
+              delay: p.delay,
+              ease: "linear",
+            }}
+          >
+            {p.type === "rose" && (
+              <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow-sm">
+                <path
+                  d="M12 2 C6 7, 2 13, 4 19 C6 24, 18 24, 20 19 C22 13, 18 7, 12 2 Z"
+                  fill="url(#rosePetalGrad)"
+                />
+              </svg>
+            )}
+
+            {p.type === "goldLeaf" && (
+              <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow-sm">
+                <path
+                  d="M12 2 C6 7, 4 16, 12 22 C20 16, 18 7, 12 2 Z"
+                  fill="url(#goldLeafGrad)"
+                />
+                <line x1="12" y1="4" x2="12" y2="20" stroke="#B89358" strokeWidth="0.6" strokeOpacity="0.4" />
+              </svg>
+            )}
+
+            {p.type === "blossom" && (
+              <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow-sm">
+                {/* 4-petal delicate flower */}
+                <circle cx="12" cy="12" r="2.5" fill="#B89358" fillOpacity="0.4" />
+                <path d="M12 2 C10 6, 10 8, 12 9 C14 8, 14 6, 12 2 Z" fill="url(#blossomGrad)" />
+                <path d="M12 22 C10 18, 10 16, 12 15 C14 16, 14 18, 12 22 Z" fill="url(#blossomGrad)" />
+                <path d="M2 12 C6 10, 8 10, 9 12 C8 14, 6 14, 2 12 Z" fill="url(#blossomGrad)" />
+                <path d="M22 12 C18 10, 16 10, 15 12 C16 14, 18 14, 22 12 Z" fill="url(#blossomGrad)" />
+              </svg>
+            )}
+          </motion.div>
+        ))}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
    LIGHTBOX MODAL FOR HIGH-RES PHOTO VIEWING
    ═══════════════════════════════════════════════════════════════ */
 
@@ -1575,6 +1765,9 @@ export default function App() {
         loop
         preload="auto"
       />
+
+      {/* Subtle Botanical & Floral Background Animations */}
+      <BotanicalBackground />
 
       <AnimatePresence>
         {!isOpened && <StarterScreen onOpen={handleOpen} />}

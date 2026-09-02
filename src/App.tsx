@@ -590,7 +590,7 @@ function EditorialNav({
   onToggleAudio: () => void;
 }) {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-40 bg-[#FAF8F5]/90 backdrop-blur-md border-b border-[#EADFD4]/70 px-4 sm:px-12 py-3.5">
+    <nav className="fixed top-0 left-0 right-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-lg border-b border-[#EADFD4]/70 px-4 sm:px-12 py-3.5">
       <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
         {/* Monogram */}
         <div className="flex items-center gap-2.5">
@@ -603,7 +603,7 @@ function EditorialNav({
         {/* Timeline Indicator */}
         <div className="hidden lg:flex items-center gap-2.5 font-sans text-xs tracking-[0.25em] uppercase text-[#881337] bg-[#FAF3EA] px-4 py-1.5 rounded-full border border-[#E8DCCF]">
           <span className="w-1.5 h-1.5 rounded-full bg-[#881337] animate-pulse" />
-          <span>July 13, 2026 • 52 Days As Husband & Wife</span>
+          <span>July 13, 2026 • Husband & Wife</span>
         </div>
 
         {/* Right Action: Romantic Audio Toggle & Date */}
@@ -622,10 +622,10 @@ function EditorialNav({
               {isPlayingAudio ? "Music Playing" : "Play Music"}
             </span>
             {isPlayingAudio && (
-              <span className="flex items-center gap-0.5 h-2.5">
-                <span className="w-0.5 h-2 bg-white animate-pulse" />
-                <span className="w-0.5 h-3 bg-white animate-pulse delay-75" />
-                <span className="w-0.5 h-1.5 bg-white animate-pulse delay-150" />
+              <span className="flex items-center gap-0.5 h-3">
+                <motion.span className="w-0.5 bg-white rounded-full inline-block" animate={{ height: ["6px", "12px", "6px"] }} transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }} />
+                <motion.span className="w-0.5 bg-white rounded-full inline-block" animate={{ height: ["12px", "4px", "12px"] }} transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut", delay: 0.15 }} />
+                <motion.span className="w-0.5 bg-white rounded-full inline-block" animate={{ height: ["4px", "11px", "4px"] }} transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut", delay: 0.3 }} />
               </span>
             )}
           </button>
@@ -708,7 +708,7 @@ function EditorialHero({ onPhotoClick }: { onPhotoClick: (item: LightboxState) =
             transition={{ duration: 1, delay: 0.7 }}
           >
             <div className="inline-flex items-center gap-2.5 font-sans text-[11px] tracking-[0.22em] uppercase bg-white/90 border border-[#E8DCCF] text-[#1C1917] px-4 sm:px-5 py-2.5 rounded-full shadow-sm font-medium">
-              <span className="w-2 h-2 rounded-full bg-[#881337] animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#881337]/80" />
               <span>Nikkah: July 13, 2026 • Day 52 as Husband & Wife</span>
             </div>
           </motion.div>
@@ -767,7 +767,13 @@ function EditorialHero({ onPhotoClick }: { onPhotoClick: (item: LightboxState) =
         <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#786C5E] font-medium">
           Read with an open heart
         </span>
-        <span className="text-[#B89358] text-xs animate-bounce">↓</span>
+        <motion.span
+          className="text-[#B89358] text-xs inline-block"
+          animate={shouldReduceMotion ? false : { y: [0, 5, 0] }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          ↓
+        </motion.span>
       </motion.div>
     </header>
   );
@@ -781,58 +787,40 @@ function SacredUnionTimeline() {
   const duration = useLiveMarriageDuration();
   const shouldReduceMotion = useReducedMotion();
 
-  const timeUnits = [
-    { label: "Days", val: duration.days, sub: "Since July 13, 2026" },
-    { label: "Hours", val: String(duration.hours).padStart(2, "0"), sub: "Of Sacred Vows" },
-    { label: "Minutes", val: String(duration.minutes).padStart(2, "0"), sub: "Choosing You" },
-    { label: "Seconds", val: String(duration.seconds).padStart(2, "0"), sub: "And Every Tomorrow" },
-  ];
-
   return (
-    <section className="py-12 px-6 sm:px-12 max-w-4xl mx-auto">
-      {/* Heirloom Sacred Union Card */}
+    <section className="py-16 px-6 sm:px-12 max-w-2xl mx-auto text-center">
       <motion.div
-        className="bg-white/80 backdrop-blur-md rounded-3xl border border-[#E8DCCF] p-8 sm:p-10 shadow-sm text-center relative overflow-hidden"
         initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 1, ease: EASE_OUT_QUART }}
+        className="space-y-5"
       >
-        {/* Subtle interior gold border line */}
-        <div className="absolute inset-2 border border-[#B89358]/20 rounded-2xl pointer-events-none" />
+        <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#881337] font-semibold block">
+          Our Sacred Journey
+        </span>
 
-        <div className="relative z-10 space-y-6">
-          <div className="space-y-1.5">
-            <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#881337] font-semibold block">
-              Our Sacred Journey • July 13, 2026
-            </span>
-            <p className="font-serif italic text-base sm:text-lg text-[#1C1917] max-w-xl mx-auto leading-snug">
-              “Fifty-two days since our hands met before Allah • and counting every second choosing you.”
-            </p>
-          </div>
+        <p className="font-display text-fluid-h3 text-[#1C1917] font-normal leading-snug">
+          <span className="text-[#881337] tabular-nums font-semibold">{duration.days}</span> days,{" "}
+          <span className="text-[#881337] tabular-nums font-semibold">{String(duration.hours).padStart(2, "0")}</span> hours,{" "}
+          <span className="text-[#881337] tabular-nums font-semibold">{String(duration.minutes).padStart(2, "0")}</span> minutes, and{" "}
+          <motion.span
+            key={duration.seconds}
+            initial={!shouldReduceMotion ? { opacity: 0.4 } : false}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="text-[#881337] tabular-nums font-semibold"
+          >
+            {String(duration.seconds).padStart(2, "0")}
+          </motion.span>{" "}
+          seconds since our hands met before Allah.
+        </p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-0 pt-2 sm:divide-x sm:divide-[#B89358]/25">
-            {timeUnits.map((s, i) => (
-              <div key={i} className="px-4 py-2 text-center">
-                <span className="font-sans text-[10px] tracking-[0.25em] uppercase text-[#786C5E] font-semibold block mb-1">
-                  {s.label}
-                </span>
-                <motion.span
-                  key={s.label === "Seconds" ? s.val : undefined}
-                  initial={s.label === "Seconds" && !shouldReduceMotion ? { opacity: 0.5, y: -2 } : false}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25, ease: EASE_OUT_QUART }}
-                  className="font-display text-3xl sm:text-4xl text-[#881337] font-normal block font-variant-numeric tabular-nums"
-                >
-                  {s.val}
-                </motion.span>
-                <span className="font-serif italic text-xs text-[#786C5E] block mt-0.5">
-                  {s.sub}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <p className="font-serif italic text-fluid-body text-[#5C4F44]">
+          And counting every second choosing you.
+        </p>
+
+        <div className="w-16 h-px bg-[#B89358]/40 mx-auto" />
       </motion.div>
     </section>
   );
@@ -899,7 +887,7 @@ function ChapterOneApology({ onPhotoClick }: { onPhotoClick: (item: LightboxStat
           transition={{ duration: 1.1, ease: EASE_OUT_QUART }}
         >
           <span className="font-sans text-fluid-eyebrow tracking-[0.3em] uppercase text-[#881337] font-semibold block">
-            52 Days as Husband & Wife
+            The Apology
           </span>
 
           <h2 className="font-display text-fluid-h2 text-[#1C1917] font-normal leading-tight">
@@ -942,12 +930,12 @@ function ChapterTwoGrief({ onPhotoClick }: { onPhotoClick: (item: LightboxState)
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="py-28 px-6 sm:px-12 bg-[#F5EFE6] relative overflow-hidden">
+    <section className="py-36 px-6 sm:px-12 bg-[#F5EFE6] relative overflow-hidden">
       <div className="max-w-5xl mx-auto">
         <SectionDivider label="Chapter II" />
 
         {/* Central Standout Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
+        <div className="text-center max-w-2xl mx-auto mb-20 space-y-4">
           <span className="font-sans text-fluid-eyebrow tracking-[0.3em] uppercase text-[#786C5E] font-medium">
             Carrying the Unspoken Weight
           </span>
@@ -1143,13 +1131,13 @@ function ChapterFourBlessing({ onPhotoClick }: { onPhotoClick: (item: LightboxSt
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="py-28 px-6 sm:px-12 bg-gradient-to-b from-[#FAF8F5] via-[#F2ECE4] to-[#FAF8F5]">
+    <section className="py-36 px-6 sm:px-12 bg-gradient-to-b from-[#FAF8F5] via-[#F2ECE4] to-[#FAF8F5]">
       <div className="max-w-5xl mx-auto text-center space-y-12">
         <SectionDivider label="Chapter IV" />
 
         {/* Big Portrait of Sanoof & Sifana Together with 3D Tilt */}
         <motion.div
-          className="max-w-3xl mx-auto"
+          className="max-w-4xl mx-auto"
           initial={shouldReduceMotion ? false : { opacity: 0, y: 35 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
@@ -1161,7 +1149,7 @@ function ChapterFourBlessing({ onPhotoClick }: { onPhotoClick: (item: LightboxSt
               onPhotoClick({
                 src: "/photos/together-portrait.jpg",
                 alt: "Sanoof and Sifana standing together peacefully on their Nikkah day",
-                caption: "July 13, 2026 — Muhammed Sanoof & Sifana. May Allah bless our marriage with love, understanding and sakinah.",
+                caption: "Muhammed Sanoof & Sifana. May Allah bless our marriage with love, understanding and sakinah.",
               })
             }
           >
@@ -1176,7 +1164,7 @@ function ChapterFourBlessing({ onPhotoClick }: { onPhotoClick: (item: LightboxSt
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
             <div className="absolute bottom-6 left-6 right-6 text-white text-center">
               <span className="font-sans text-[11px] tracking-[0.3em] uppercase text-[#F5EFE6]/90 block mb-1">
-                July 13, 2026 • Muhammed Sanoof & Sifana
+                Muhammed Sanoof & Sifana
               </span>
               <p className="font-serif italic text-lg sm:text-xl">
                 “Bless our marriage with love, understanding and sakinah.”
@@ -1574,42 +1562,70 @@ function ForAllOurTomorrows() {
         </p>
       </div>
 
-      <div className="space-y-6">
-        {promises.map((p, idx) => (
-          <motion.div
-            key={idx}
-            className="bg-white/85 backdrop-blur-sm rounded-3xl border border-[#EADFD4] p-7 sm:p-9 shadow-sm hover:border-[#B89358]/60 hover:shadow-md transition-all duration-500 relative overflow-hidden group"
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 0.8, delay: idx * 0.12, ease: EASE_OUT_QUART }}
-          >
-            {/* Subtle corner gold leaf accent */}
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#B89358]/10 via-transparent to-transparent pointer-events-none" />
+      <div className="space-y-16">
+        {/* Promise I — Open, full-width pull-quote style */}
+        <motion.div
+          className="text-center space-y-4 max-w-xl mx-auto"
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.8, ease: EASE_OUT_QUART }}
+        >
+          <span className="font-serif text-5xl text-[#B89358]/40 select-none leading-none block">“</span>
+          <h3 className="font-display text-fluid-h3 text-[#1C1917] font-normal leading-snug -mt-4">
+            {promises[0].title}
+          </h3>
+          <p className="font-serif text-fluid-lead text-[#3E3834] leading-relaxed">
+            {promises[0].text}
+          </p>
+          <span className="font-serif text-5xl text-[#B89358]/40 select-none leading-none block">”</span>
+        </motion.div>
 
-            <div className="flex items-start gap-4 sm:gap-5 relative z-10">
-              <span className="w-10 h-10 rounded-full bg-[#FAF3EA] border border-[#B89358]/50 flex items-center justify-center font-serif text-sm font-semibold text-[#881337] flex-shrink-0 shadow-sm group-hover:bg-[#881337] group-hover:text-white transition-colors duration-300">
-                {p.number}
-              </span>
-              <div className="space-y-2.5 flex-1">
-                <h3 className="font-display text-fluid-lead font-medium text-[#1C1917] tracking-tight">
-                  {p.title}
-                </h3>
-                <p className="font-serif text-fluid-body text-[#3E3834] leading-relaxed">
-                  {p.text}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        ))}
+        {/* Promise II — Left-aligned, warm inset background */}
+        <motion.div
+          className="bg-gradient-to-br from-[#FAF3EA] to-[#F5ECE0] rounded-2xl p-8 sm:p-10 border border-[#B89358]/30 max-w-2xl"
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.8, delay: 0.1, ease: EASE_OUT_QUART }}
+        >
+          <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#881337] font-semibold block mb-3">
+            II
+          </span>
+          <h3 className="font-display text-fluid-lead font-medium text-[#1C1917] tracking-tight mb-3">
+            {promises[1].title}
+          </h3>
+          <p className="font-serif text-fluid-body text-[#3E3834] leading-relaxed">
+            {promises[1].text}
+          </p>
+        </motion.div>
+
+        {/* Promise III — Centered, most visual weight, the culminating vow */}
+        <motion.div
+          className="text-center max-w-xl mx-auto py-10 border-y border-[#B89358]/30 space-y-4"
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: EASE_OUT_QUART }}
+        >
+          <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#B89358] font-semibold block">
+            III • The Final Vow
+          </span>
+          <h3 className="font-display text-fluid-h2 text-[#881337] font-normal leading-tight">
+            {promises[2].title}
+          </h3>
+          <p className="font-serif text-fluid-lead text-[#1C1917] leading-relaxed">
+            {promises[2].text}
+          </p>
+        </motion.div>
       </div>
 
       {/* Birthday Wish Candle Ritual */}
       <BirthdayCandleRitual />
 
-      {/* Closing Signature */}
-      <div className="text-center mt-16 pt-10 border-t border-[#B89358]/25 space-y-2">
-        <div className="flex items-center justify-center gap-3 mb-4">
+      {/* Closing Signature — Semantic Footer with Generous Breathing Room */}
+      <footer className="text-center mt-24 pt-14 border-t border-[#B89358]/25 space-y-3 pb-8">
+        <div className="flex items-center justify-center gap-3 mb-6">
           <BotanicalRose className="w-10 h-10" />
           <InteractiveButterfly className="w-11 h-11" showWhisper={true} />
         </div>
@@ -1619,10 +1635,10 @@ function ForAllOurTomorrows() {
         <p className="font-display text-fluid-h3 text-[#881337] font-normal">
           Muhammed Sanoof
         </p>
-        <p className="font-sans text-[11px] tracking-[0.25em] uppercase text-[#786C5E] pt-2 font-medium">
+        <p className="font-sans text-[11px] tracking-[0.25em] uppercase text-[#786C5E] pt-4 font-medium">
           July 13, 2026 — To Eternity
         </p>
-      </div>
+      </footer>
     </section>
   );
 }

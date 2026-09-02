@@ -3,7 +3,7 @@
 @theme {
   --font-serif: "Cormorant Garamond", Georgia, serif;
   --font-display: "Playfair Display", Georgia, serif;
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* ─── Global Reset & Clean Canvas ─── */

@@ -16,91 +16,108 @@ import {
 const EASE_OUT_QUART = [0.25, 1, 0.5, 1] as const;
 
 /* ═══════════════════════════════════════════════════════════════
-   AMBIENT ACOUSTIC MUSIC SYNTHESIZER (WEB AUDIO API)
-   Zero external dependencies, works seamlessly offline & on Vercel
+   STARTER & LOADER SCREEN: THE QUIET INVITATION
    ═══════════════════════════════════════════════════════════════ */
 
-class AmbientMusicBox {
-  private ctx: AudioContext | null = null;
-  private isPlaying = false;
-  private timer: number | null = null;
-  private noteIdx = 0;
+function StarterScreen({ onOpen }: { onOpen: () => void }) {
+  const [isOpening, setIsOpening] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
-  // Soft, peaceful acoustic bell progression (F maj9 / D min9 / Bb maj7)
-  private melody = [
-    349.23, // F4
-    440.0,  // A4
-    523.25, // C5
-    659.25, // E5
-    587.33, // D5
-    440.0,  // A4
-    392.0,  // G4
-    523.25, // C5
-    466.16, // Bb4
-    392.0,  // G4
-    349.23, // F4
-    261.63, // C4
-    349.23, // F4
-    440.0,  // A4
-    392.0,  // G4
-    329.63, // E4
-  ];
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoaded(true), 500);
+    return () => clearTimeout(t);
+  }, []);
 
-  start() {
-    if (this.isPlaying) return;
-    try {
-      const AudioCtx =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (!AudioCtx) return;
-      this.ctx = new AudioCtx();
-      this.isPlaying = true;
-      this.scheduleNext();
-    } catch {
-      // AudioContext policy fallback
-    }
-  }
-
-  private scheduleNext = () => {
-    if (!this.isPlaying || !this.ctx) return;
-    const freq = this.melody[this.noteIdx];
-    this.noteIdx = (this.noteIdx + 1) % this.melody.length;
-    this.playTone(freq);
-    this.timer = window.setTimeout(this.scheduleNext, 1250);
+  const handleOpenClick = () => {
+    setIsOpening(true);
+    setTimeout(() => {
+      onOpen();
+    }, 700);
   };
 
-  private playTone(freq: number) {
-    if (!this.ctx || this.ctx.state === "suspended") return;
-    const now = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
+  return (
+    <motion.div
+      className="fixed inset-0 z-50 bg-[#FAF8F5] flex items-center justify-center p-6 select-none overflow-hidden"
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0, scale: 1.04, filter: "blur(6px)" }}
+      transition={{ duration: 0.85, ease: EASE_OUT_QUART }}
+    >
+      {/* Background ambient glow */}
+      <div className="absolute w-[600px] h-[600px] bg-[#F2DFD0]/50 rounded-full blur-3xl pointer-events-none" />
 
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(freq, now);
+      <motion.div
+        className="relative max-w-lg w-full bg-[#FAF8F5]/90 backdrop-blur-md border border-[#EADFD4] rounded-3xl p-8 sm:p-12 text-center shadow-[0_24px_50px_-12px_rgba(136,19,55,0.08)] space-y-7"
+        initial={{ opacity: 0, y: 20, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 1, ease: EASE_OUT_QUART }}
+      >
+        {/* Sacred Bismillah */}
+        <p className="font-serif italic text-sm text-[#881337] tracking-widest">
+          بسم الله الرحمن الرحيم
+        </p>
 
-    // Warm, soft acoustic bell envelope
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.12, now + 0.08);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
+        {/* Monogram Header */}
+        <div className="space-y-3">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full border border-[#B89358]/50 bg-white/80 shadow-sm mx-auto">
+            <GoldKnotIcon className="w-8 h-8 text-[#B89358]" />
+          </div>
+          <p className="font-sans text-[11px] tracking-[0.3em] uppercase text-[#786C5E] font-semibold">
+            A Bespoke Keepsake • For My Wife
+          </p>
+          <h1 className="font-display text-3xl sm:text-4xl text-[#1C1917] font-normal leading-tight">
+            For Sifana
+          </h1>
+          <p className="font-serif italic text-sm text-[#881337]">
+            On your first birthday since our Nikkah • September 3, 2026
+          </p>
+        </div>
 
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
+        <div className="w-20 h-px bg-[#B89358]/40 mx-auto" />
 
-    osc.start(now);
-    osc.stop(now + 1.85);
-  }
+        {/* Wax Seal / Tap to Open Button */}
+        <div className="space-y-4 pt-1">
+          <motion.button
+            onClick={handleOpenClick}
+            disabled={!isLoaded || isOpening}
+            className="group relative inline-flex flex-col items-center cursor-pointer p-3 focus:outline-none"
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+            aria-label="Tap to open letter and start music"
+          >
+            {/* Glowing Wax Seal Aura */}
+            <motion.div
+              className="w-16 h-16 rounded-full bg-[#881337] flex items-center justify-center text-white shadow-[0_8px_24px_rgba(136,19,55,0.35)] group-hover:shadow-[0_12px_28px_rgba(136,19,55,0.5)] transition-shadow border-2 border-[#B89358]/60"
+              animate={
+                isOpening
+                  ? { scale: [1, 1.4, 0], opacity: [1, 0.8, 0] }
+                  : shouldReduceMotion
+                  ? {}
+                  : { scale: [1, 1.05, 1] }
+              }
+              transition={{
+                duration: isOpening ? 0.6 : 3,
+                repeat: isOpening ? 0 : Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              <span className="font-serif text-xl text-[#F6EDE2]">❦</span>
+            </motion.div>
 
-  stop() {
-    this.isPlaying = false;
-    if (this.timer) {
-      clearTimeout(this.timer);
-      this.timer = null;
-    }
-    if (this.ctx) {
-      this.ctx.close();
-      this.ctx = null;
-    }
-  }
+            <span className="font-sans text-xs tracking-[0.25em] uppercase text-[#1C1917] font-semibold mt-4 group-hover:text-[#881337] transition-colors">
+              {isOpening ? "Opening with Love..." : "Tap to Open Letter"}
+            </span>
+          </motion.button>
+
+          {/* Music Notification */}
+          <div className="flex items-center justify-center gap-1.5 text-[11px] font-serif italic text-[#786C5E]">
+            <span>♫</span>
+            <span>Includes romantic background melody</span>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -361,7 +378,7 @@ function EditorialNav({
           <span>July 13, 2026 • 52 Days As Husband & Wife</span>
         </div>
 
-        {/* Right Action: Ambient Audio Toggle & Date */}
+        {/* Right Action: Romantic Audio Toggle & Date */}
         <div className="flex items-center gap-3">
           <button
             onClick={onToggleAudio}
@@ -370,11 +387,11 @@ function EditorialNav({
                 ? "bg-[#881337] text-white border-[#881337] shadow-sm"
                 : "bg-white/80 hover:bg-[#FAF3EA] text-[#881337] border-[#B89358]/50"
             }`}
-            aria-label={isPlayingAudio ? "Pause ambient melody" : "Play ambient acoustic melody"}
+            aria-label={isPlayingAudio ? "Pause romantic music" : "Play romantic music"}
           >
             <span className="text-xs">{isPlayingAudio ? "⏸" : "♫"}</span>
             <span className="text-[11px] font-medium hidden sm:inline">
-              {isPlayingAudio ? "Melody Playing" : "Play Melody"}
+              {isPlayingAudio ? "Music Playing" : "Play Music"}
             </span>
             {isPlayingAudio && (
               <span className="flex items-center gap-0.5 h-2.5">
@@ -531,7 +548,7 @@ function EditorialHero({ onPhotoClick }: { onPhotoClick: (item: LightboxState) =
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   DELIGHT 1: THE LIVE SACRED TICKER (DAY 52 & COUNTING EVERY SECOND)
+   LIVE SACRED TICKER (DAY 52 & COUNTING EVERY SECOND)
    ═══════════════════════════════════════════════════════════════ */
 
 function SacredUnionTimeline() {
@@ -956,7 +973,7 @@ function ChapterFourBlessing({ onPhotoClick }: { onPhotoClick: (item: LightboxSt
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   DELIGHT 2: "MAKE A BIRTHDAY WISH" CANDLE RITUAL
+   DELIGHT: "MAKE A BIRTHDAY WISH" CANDLE RITUAL
    ═══════════════════════════════════════════════════════════════ */
 
 function BirthdayCandleRitual() {
@@ -1313,32 +1330,63 @@ function ScrollCompanion() {
    ═══════════════════════════════════════════════════════════════ */
 
 export default function App() {
+  const [isOpened, setIsOpened] = useState(false);
   const [activeLightbox, setActiveLightbox] = useState<LightboxState | null>(null);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  const musicBoxRef = useRef<AmbientMusicBox | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
-    musicBoxRef.current = new AmbientMusicBox();
-    return () => {
-      if (musicBoxRef.current) {
-        musicBoxRef.current.stop();
-      }
-    };
-  }, []);
+  const handleOpen = () => {
+    setIsOpened(true);
+    if (audioRef.current) {
+      audioRef.current.volume = 0;
+      audioRef.current
+        .play()
+        .then(() => {
+          setIsPlayingAudio(true);
+          // Soft volume fade-in over 2 seconds
+          let vol = 0;
+          const interval = setInterval(() => {
+            if (!audioRef.current) return;
+            vol = Math.min(0.42, vol + 0.04);
+            audioRef.current.volume = vol;
+            if (vol >= 0.42) clearInterval(interval);
+          }, 120);
+        })
+        .catch(() => {
+          // Autoplay policy fallback
+        });
+    }
+  };
 
   const handleToggleAudio = () => {
-    if (!musicBoxRef.current) return;
+    if (!audioRef.current) return;
     if (isPlayingAudio) {
-      musicBoxRef.current.stop();
+      audioRef.current.pause();
       setIsPlayingAudio(false);
     } else {
-      musicBoxRef.current.start();
-      setIsPlayingAudio(true);
+      audioRef.current
+        .play()
+        .then(() => {
+          setIsPlayingAudio(true);
+        })
+        .catch(() => {});
     }
   };
 
   return (
     <div className="min-h-screen relative font-serif text-[#1C1917] bg-[#FAF8F5] selection:bg-[#881337]/15">
+      {/* Background Audio Element with Pixabay Romantic Track */}
+      <audio
+        ref={audioRef}
+        src="/audio/romantic.mp3"
+        loop
+        preload="auto"
+      />
+
+      <AnimatePresence>
+        {!isOpened && <StarterScreen onOpen={handleOpen} />}
+      </AnimatePresence>
+
       <EditorialNav
         isPlayingAudio={isPlayingAudio}
         onToggleAudio={handleToggleAudio}

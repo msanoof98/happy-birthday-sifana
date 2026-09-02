@@ -82,37 +82,57 @@ function StarterScreen({ onOpen }: { onOpen: () => void }) {
             disabled={!isLoaded || isOpening}
             className="group relative inline-flex flex-col items-center cursor-pointer p-3 focus:outline-none"
             whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
-            aria-label="Tap to open letter and start music"
+            whileTap={{ scale: 0.95 }}
+            aria-label="Tap wax seal to open letter and start romantic melody"
           >
             {/* Glowing Wax Seal Aura */}
-            <motion.div
-              className="w-16 h-16 rounded-full bg-[#881337] flex items-center justify-center text-white shadow-[0_8px_24px_rgba(136,19,55,0.35)] group-hover:shadow-[0_12px_28px_rgba(136,19,55,0.5)] transition-shadow border-2 border-[#B89358]/60"
-              animate={
-                isOpening
-                  ? { scale: [1, 1.4, 0], opacity: [1, 0.8, 0] }
-                  : shouldReduceMotion
-                  ? {}
-                  : { scale: [1, 1.05, 1] }
-              }
-              transition={{
-                duration: isOpening ? 0.6 : 3,
-                repeat: isOpening ? 0 : Infinity,
-                ease: "easeInOut",
-              }}
-            >
-              <span className="font-serif text-xl text-[#F6EDE2]">❦</span>
-            </motion.div>
+            <div className="relative">
+              {/* Subtle expanding beacon ring */}
+              <motion.div
+                className="absolute inset-0 rounded-full bg-[#881337]/20 -z-10"
+                animate={
+                  shouldReduceMotion
+                    ? {}
+                    : {
+                        scale: [1, 1.45, 1.6],
+                        opacity: [0.6, 0.2, 0],
+                      }
+                }
+                transition={{
+                  duration: 2.4,
+                  repeat: Infinity,
+                  ease: "easeOut",
+                }}
+              />
+
+              <motion.div
+                className="w-16 h-16 rounded-full bg-[#881337] flex items-center justify-center text-white shadow-[0_8px_24px_rgba(136,19,55,0.35)] group-hover:shadow-[0_12px_28px_rgba(136,19,55,0.5)] transition-shadow border-2 border-[#B89358]/60"
+                animate={
+                  isOpening
+                    ? { scale: [1, 1.35, 0], opacity: [1, 0.8, 0] }
+                    : shouldReduceMotion
+                    ? {}
+                    : { scale: [1, 1.05, 1] }
+                }
+                transition={{
+                  duration: isOpening ? 0.55 : 3,
+                  repeat: isOpening ? 0 : Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                <span className="font-serif text-xl text-[#F6EDE2]">❦</span>
+              </motion.div>
+            </div>
 
             <span className="font-sans text-xs tracking-[0.25em] uppercase text-[#1C1917] font-semibold mt-4 group-hover:text-[#881337] transition-colors">
-              {isOpening ? "Opening with Love..." : "Tap to Open Letter"}
+              {isOpening ? "Opening with Love..." : "Tap seal to open with love ❦"}
             </span>
           </motion.button>
 
           {/* Music Notification */}
           <div className="flex items-center justify-center gap-1.5 text-[11px] font-serif italic text-[#786C5E]">
             <span>♫</span>
-            <span>Includes romantic background melody</span>
+            <span>Turn sound on • Romantic piano begins on opening</span>
           </div>
         </div>
       </motion.div>
@@ -553,22 +573,23 @@ function EditorialHero({ onPhotoClick }: { onPhotoClick: (item: LightboxState) =
 
 function SacredUnionTimeline() {
   const duration = useLiveMarriageDuration();
+  const shouldReduceMotion = useReducedMotion();
 
   const timeUnits = [
     { label: "Days", val: duration.days, sub: "Since July 13, 2026" },
-    { label: "Hours", val: String(duration.hours).padStart(2, "0"), sub: "Of Shared Vows" },
+    { label: "Hours", val: String(duration.hours).padStart(2, "0"), sub: "Of Sacred Vows" },
     { label: "Minutes", val: String(duration.minutes).padStart(2, "0"), sub: "Choosing You" },
-    { label: "Seconds", val: String(duration.seconds).padStart(2, "0"), sub: "And Counting..." },
+    { label: "Seconds", val: String(duration.seconds).padStart(2, "0"), sub: "And Every Tomorrow" },
   ];
 
   return (
     <section className="py-12 px-6 sm:px-12 max-w-5xl mx-auto border-y border-[#EADFD4]/80">
-      <div className="text-center mb-6">
+      <div className="text-center mb-6 space-y-1">
         <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#881337] font-semibold block">
-          Our Sacred Journey
+          52 Days of Sacred Marriage
         </span>
-        <p className="font-serif italic text-sm sm:text-base text-[#5C4F44] mt-1">
-          Counting every single second as husband and wife — until eternity.
+        <p className="font-serif italic text-sm sm:text-base text-[#5C4F44]">
+          Counting every single second as husband and wife — since July 13, 2026 until eternity.
         </p>
       </div>
 
@@ -581,9 +602,15 @@ function SacredUnionTimeline() {
             <span className="font-sans text-[10px] tracking-[0.25em] uppercase text-[#786C5E] font-semibold block mb-1">
               {s.label}
             </span>
-            <span className="font-display text-3xl sm:text-4xl text-[#881337] font-normal block font-variant-numeric tabular-nums">
+            <motion.span
+              key={s.label === "Seconds" ? s.val : undefined}
+              initial={s.label === "Seconds" && !shouldReduceMotion ? { opacity: 0.6, y: -2 } : false}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25, ease: EASE_OUT_QUART }}
+              className="font-display text-3xl sm:text-4xl text-[#881337] font-normal block font-variant-numeric tabular-nums"
+            >
               {s.val}
-            </span>
+            </motion.span>
             <span className="font-serif italic text-xs text-[#786C5E] block mt-1">
               {s.sub}
             </span>
@@ -665,7 +692,7 @@ function ChapterOneApology({ onPhotoClick }: { onPhotoClick: (item: LightboxStat
           <div className="w-16 h-0.5 bg-[#B89358]" />
 
           <p className="font-serif text-fluid-body text-[#3E3834] leading-relaxed">
-            Your birthday feels especially important to me because this is your first birthday after our nikkah, and I wish I could make it as beautiful and special as you deserve.
+            Your birthday feels especially important to me because this is your first birthday after our nikkah, and I want to make it as beautiful, peaceful, and special as you deserve.
           </p>
 
           <div className="p-6 bg-[#FAF3EA] border-l-4 border-[#881337] rounded-r-2xl shadow-sm">
@@ -985,13 +1012,13 @@ function BirthdayCandleRitual() {
   };
 
   return (
-    <div className="my-16 p-8 sm:p-10 bg-white/75 border border-[#EADFD4] rounded-3xl text-center space-y-5 shadow-sm relative overflow-hidden">
+    <div className="my-16 p-8 sm:p-12 bg-white/75 border border-[#EADFD4] rounded-3xl text-center space-y-5 shadow-sm relative overflow-hidden">
       {/* Background warm shimmer */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#FAF3EA]/40 to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#FAF3EA]/50 to-transparent pointer-events-none" />
 
       <div className="relative z-10 space-y-4">
         <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#881337] font-semibold block">
-          A Birthday Ritual
+          A Sacred Birthday Ritual • September 3, 2026
         </span>
         <h3 className="font-display text-fluid-h3 text-[#1C1917] font-normal">
           Make a Wish, My Butterfly
@@ -1000,7 +1027,7 @@ function BirthdayCandleRitual() {
         {!wishSealed ? (
           <>
             <p className="font-serif italic text-fluid-body text-[#5C4F44] max-w-md mx-auto leading-relaxed">
-              Close your eyes, make a silent wish for our home and marriage, then tap the flame to seal your prayer.
+              Close your eyes, make a silent wish for our marriage and our future, then tap the flame to seal your prayer with Allah.
             </p>
 
             {/* Candle with Flickering Flame */}
@@ -1008,27 +1035,29 @@ function BirthdayCandleRitual() {
               <button
                 onClick={handleMakeWish}
                 className="group flex flex-col items-center cursor-pointer p-3 rounded-2xl hover:bg-[#FAF3EA]/50 transition-colors focus:outline-none"
-                aria-label="Tap flame to make a birthday wish"
+                aria-label="Tap flame to seal your birthday wish"
               >
-                {/* Flame */}
-                <motion.div
-                  className="w-7 h-10 relative mb-1"
-                  animate={
-                    shouldReduceMotion
-                      ? {}
-                      : {
-                          scaleY: [1, 1.15, 0.95, 1.1, 1],
-                          scaleX: [1, 0.92, 1.08, 0.95, 1],
-                          rotate: [-2, 2, -1, 3, 0],
-                        }
-                  }
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  {/* Glow Aura */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#B89358] to-[#FFD580] rounded-full blur-sm opacity-70 group-hover:opacity-100 transition-opacity" />
-                  {/* Inner flame */}
-                  <div className="absolute inset-x-1 bottom-0 top-1 bg-gradient-to-t from-[#881337] via-[#B89358] to-white rounded-full" />
-                </motion.div>
+                {/* Flame with ambient aura */}
+                <div className="relative mb-1">
+                  <motion.div
+                    className="w-7 h-10 relative"
+                    animate={
+                      shouldReduceMotion
+                        ? {}
+                        : {
+                            scaleY: [1, 1.14, 0.96, 1.1, 1],
+                            scaleX: [1, 0.94, 1.06, 0.96, 1],
+                            rotate: [-2, 2, -1, 3, 0],
+                          }
+                    }
+                    transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    {/* Glow Aura */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#B89358] to-[#FFD580] rounded-full blur-sm opacity-75 group-hover:opacity-100 transition-opacity" />
+                    {/* Inner flame */}
+                    <div className="absolute inset-x-1 bottom-0 top-1 bg-gradient-to-t from-[#881337] via-[#B89358] to-white rounded-full" />
+                  </motion.div>
+                </div>
 
                 {/* Candle Body */}
                 <div className="w-6 h-12 bg-gradient-to-b from-[#F6EDE2] to-[#E5D7C7] rounded-sm border border-[#D5C5B3]/60 shadow-inner" />
@@ -1041,23 +1070,30 @@ function BirthdayCandleRitual() {
           </>
         ) : (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.8, ease: EASE_OUT_QUART }}
-            className="p-6 bg-[#FAF3EA]/80 rounded-2xl border border-[#B89358]/30 space-y-3 max-w-lg mx-auto"
+            className="p-8 bg-[#FAF3EA]/90 rounded-2xl border border-[#B89358]/35 space-y-4 max-w-lg mx-auto shadow-sm"
           >
-            <span className="font-serif italic text-sm text-[#881337] block">
-              بسم الله الرحمن الرحيم
-            </span>
+            <div className="space-y-1">
+              <span className="font-sans text-[10px] tracking-[0.25em] uppercase text-[#881337] font-semibold block">
+                Your Wish is Sealed ❦
+              </span>
+              <span className="font-serif italic text-sm text-[#786C5E] block">
+                بسم الله الرحمن الرحيم
+              </span>
+            </div>
+
             <p className="font-display text-fluid-lead text-[#1C1917] font-normal leading-relaxed">
-              “May Allah answer every silent prayer of your heart, preserve the light in your eyes, and fill our marriage with everlasting sakinah and joy. Ameen.”
+              “May Allah answer every silent prayer of your heart, preserve the light in your eyes, and fill our marriage with everlasting love, understanding, and sakinah. Ameen.”
             </p>
-            <div className="pt-2">
+
+            <div className="pt-2 border-t border-[#B89358]/20">
               <button
                 onClick={() => setWishSealed(false)}
-                className="font-sans text-[10px] tracking-[0.2em] uppercase text-[#786C5E] hover:text-[#1C1917] underline underline-offset-4 cursor-pointer"
+                className="font-sans text-[10px] tracking-[0.2em] uppercase text-[#786C5E] hover:text-[#881337] underline underline-offset-4 cursor-pointer transition-colors"
               >
-                Relight Candle
+                Make Another Wish
               </button>
             </div>
           </motion.div>
